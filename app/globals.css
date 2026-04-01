@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #03243F;
+  --green: #18A96B;
+  --amber: #F4A636;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  color: #1a1a2e;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Playfair Display', serif;
+}
+
+.btn-primary {
+  @apply bg-[#18A96B] hover:bg-[#13875A] text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg;
+}
+
+.btn-secondary {
+  @apply border-2 border-[#18A96B] text-[#18A96B] hover:bg-[#18A96B] hover:text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200;
+}
+
+.card {
+  @apply bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200;
+}
