@@ -1,170 +1,245 @@
+import { createClient } from '@/lib/supabase/server'
+import { notFound } from 'next/navigation'
+import ContactForm from './contact-form'
 import Link from 'next/link'
 
-const TRAINER_DATA: Record<string, {
-  name: string, specialty: string, bio: string, tagline: string, rating: number, reviews: number,
-  price: number, initials: string, color: string, cert: string, format: string, location: string,
-  platforms: { name: string, rating: number, count: number }[], scores: Record<string, number>,
-  availability: string[], packages: { name: string, price: number, desc: string }[],
-  reviewList: { author: string, platform: string, rating: number, text: string, date: string }[]
-}> = {
-  '1': {
-    name: 'Marcus Johnson', specialty: 'Strength & Conditioning', tagline: 'Transform your body, transform your life.',
-    bio: 'NASM-certified personal trainer with 8+ years helping College Station clients build strength, lose fat, and compete at their best. Specializes in evidence-based programming for sustainable results.',
-    rating: 4.9, reviews: 87, price: 65, initials: 'MJ', color: 'from-[#03243F] to-[#18A96B]',
-    cert: 'NASM CPT', format: 'In-Person', location: 'College Station, TX',
-    platforms: [{ name: 'Google', rating: 4.9, count: 54 }, { name: 'Yelp', rating: 4.8, count: 33 }],
-    scores: { Results: 4.9, Communication: 4.8, Punctuality: 5.0, Value: 4.7 },
-    availability: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-    packages: [
-      { name: 'Single Session', price: 65, desc: 'One 60-minute training session.' },
-      { name: '10-Pack', price: 550, desc: '10 sessions, save $100. Most popular.' },
-      { name: 'Monthly Unlimited', price: 400, desc: 'Unlimited sessions, 3x/week max.' },
-    ],
-    reviewList: [
-      { author: 'Jake T.', platform: 'Google', rating: 5, text: 'Marcus helped me lose 30 lbs in 4 months. Best investment I have ever made in my health.', date: 'March 2026' },
-      { author: 'Emily R.', platform: 'Yelp', rating: 5, text: 'Incredibly knowledgeable and motivating. I look forward to every session.', date: 'February 2026' },
-      { author: 'David M.', platform: 'Google', rating: 4, text: 'Great trainer, very professional. Would recommend to anyone serious about getting fit.', date: 'January 2026' },
-    ],
-  },
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('trainer_profiles')
+    .select('full_name, tagline, bio')
+    .eq('slug', params.id)
+    .single()
+  if (!data) return { title: 'Trainer Not Found' }
+  return {
+    title: `${data.full_name} | MyTrustedTrainer`,
+    description: data.tagline || data.bio?.substring(0, 160) || ''
+  }
 }
 
-export default function TrainerProfilePage({ params }: { params: { id: string } }) {
-  const t = TRAINER_DATA[params.id] || TRAINER_DATA['1']
+export default async function TrainerProfilePage({ params }: { params: { id: string } }) {
+  const supabase = await createClient()
+  const { data: trainer } = await supabase
+    .from('trainer_profiles')
+    .select(`*, trainer_scores(*), trainer_specialties(*), certifications(*), packages(*)`)
+    .eq('slug', params.id)
+    .single()
+
+  if (!trainer) notFound()
+
+  const { data: reviews } = await supabase
+    .from('reviews')
+    .select('*')
+    .eq('trainer_id', trainer.id)
+    .order('review_date', { ascending: false })
+    .limit(10)
+
+  const score = trainer.trainer_scores
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <nav className="bg-[#03243F] text-white px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="text-[#18A96B] text-xl font-bold font-[Playfair_Display,serif]">MyTrustedTrainer</Link>
-        <div className="flex gap-4">
+    <div className="min-h-screen bg-gray-50">
+      {/* Nav */}
+      <nav className="bg-[#03243F] text-white px-6 py-4">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <Link href="/" className="text-xl font-bold" style={{fontFamily:'Playfair Display'}}>
+            <span className="text-[#18A96B]">My</span>TrustedTrainer
+          </Link>
           <Link href="/search" className="text-gray-300 hover:text-white text-sm">← Back to Search</Link>
-          <Link href="/signup" className="bg-[#18A96B] hover:bg-[#13875A] text-white text-sm px-4 py-1.5 rounded-lg font-semibold">Sign Up</Link>
         </div>
       </nav>
 
       {/* Hero */}
-      <div className={`bg-gradient-to-br ${t.color} text-white py-12 px-6`}>
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-6">
-          <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-3xl shrink-0">{t.initials}</div>
-          <div className="flex-1 text-center sm:text-left">
-            <h1 className="text-3xl font-bold font-[Playfair_Display,serif] mb-1">{t.name}</h1>
-            <p className="text-white/80 mb-2">{t.tagline}</p>
-            <div className="flex flex-wrap justify-center sm:justify-start gap-3 text-sm">
-              <span className="bg-white/20 px-3 py-1 rounded-full">{t.cert}</span>
-              <span className="bg-white/20 px-3 py-1 rounded-full">{t.format}</span>
-              <span className="bg-white/20 px-3 py-1 rounded-full">{t.location}</span>
+      <div className="bg-[#03243F]">
+        <div className="max-w-5xl mx-auto px-6 py-12">
+          <div className="flex flex-col md:flex-row items-start gap-6">
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-[#18A96B] flex items-center justify-center text-white text-4xl font-bold flex-shrink-0">
+              {trainer.avatar_url
+                ? <img src={trainer.avatar_url} alt={trainer.full_name} className="w-full h-full rounded-2xl object-cover" />
+                : trainer.full_name.charAt(0)
+              }
             </div>
-          </div>
-          <div className="text-center shrink-0">
-            <div className="text-4xl font-bold">{t.rating} ★</div>
-            <div className="text-white/70 text-sm">{t.reviews} reviews</div>
-            <div className="text-white font-bold text-xl mt-1">${t.price}/session</div>
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-3 mb-2">
+                <h1 className="text-3xl md:text-4xl font-bold text-white" style={{fontFamily:'Playfair Display'}}>
+                  {trainer.full_name}
+                </h1>
+                {trainer.is_verified && (
+                  <span className="bg-[#18A96B] text-white text-xs px-2 py-1 rounded-full">✓ Verified</span>
+                )}
+              </div>
+              {trainer.tagline && <p className="text-gray-300 text-lg mb-3">{trainer.tagline}</p>}
+              <div className="flex flex-wrap gap-4 text-sm text-gray-300">
+                <span>📍 {trainer.city}, {trainer.state}</span>
+                {score?.total_review_count > 0 && (
+                  <span>⭐ {score.overall_score?.toFixed(1)} · {score.total_review_count} reviews</span>
+                )}
+              </div>
+            </div>
+            {/* Score Badge */}
+            {score?.overall_score > 0 && (
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-4 text-center flex-shrink-0">
+                <div className="text-4xl font-bold text-[#F4A636]">{score.overall_score?.toFixed(1)}</div>
+                <div className="text-yellow-400 text-lg">{'★'.repeat(Math.round(score.overall_score))}</div>
+                <div className="text-gray-300 text-sm">{score.total_review_count} reviews</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Score Strip */}
-      <div className="bg-white border-b border-gray-100 py-4 px-6">
-        <div className="max-w-5xl mx-auto flex flex-wrap justify-center gap-8">
-          {Object.entries(t.scores).map(([key, val]) => (
-            <div key={key} className="text-center">
-              <div className="text-[#18A96B] font-bold text-xl">{(val as number).toFixed(1)}</div>
-              <div className="text-gray-500 text-xs">{key}</div>
+      <div className="max-w-5xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Specialties */}
+          {trainer.trainer_specialties?.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <h2 className="text-xl font-bold text-[#03243F] mb-4" style={{fontFamily:'Playfair Display'}}>Specialties</h2>
+              <div className="flex flex-wrap gap-2">
+                {trainer.trainer_specialties.map((s: any) => (
+                  <span key={s.id} className="bg-[#E8F8F2] text-[#18A96B] px-4 py-2 rounded-full text-sm font-medium">
+                    {s.specialty}
+                  </span>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
+          )}
 
-      {/* Body */}
-      <div className="max-w-5xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-6">
-        {/* Main */}
-        <div className="md:col-span-2 space-y-6">
-          {/* Bio */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-            <h2 className="text-xl font-bold text-[#03243F] mb-3 font-[Playfair_Display,serif]">About {t.name}</h2>
-            <p className="text-gray-600 leading-relaxed">{t.bio}</p>
-          </div>
+          {/* About */}
+          {trainer.bio && (
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <h2 className="text-xl font-bold text-[#03243F] mb-4" style={{fontFamily:'Playfair Display'}}>About</h2>
+              <p className="text-gray-700 leading-relaxed whitespace-pre-line">{trainer.bio}</p>
+            </div>
+          )}
 
-          {/* Platform Breakdown */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-            <h2 className="text-xl font-bold text-[#03243F] mb-4 font-[Playfair_Display,serif]">Review Sources</h2>
-            <div className="space-y-3">
-              {t.platforms.map(p => (
-                <div key={p.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                  <span className="font-medium text-gray-700">{p.name}</span>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#F4A636] font-bold">{p.rating} ★</span>
-                    <span className="text-gray-400 text-sm">({p.count} reviews)</span>
+          {/* Review Sources */}
+          {score && (
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <h2 className="text-xl font-bold text-[#03243F] mb-4" style={{fontFamily:'Playfair Display'}}>Review Scores</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  {label:'Google', score: score.google_score, count: score.google_count, color:'#4285F4'},
+                  {label:'Yelp', score: score.yelp_score, count: score.yelp_count, color:'#D32323'},
+                  {label:'Facebook', score: score.facebook_score, count: score.facebook_count, color:'#1877F2'},
+                  {label:'Platform', score: score.platform_score, count: score.platform_count, color:'#18A96B'},
+                ].filter(s => s.count > 0).map(s => (
+                  <div key={s.label} className="text-center p-3 bg-gray-50 rounded-xl">
+                    <div className="text-2xl font-bold" style={{color: s.color}}>{s.score?.toFixed(1)}</div>
+                    <div className="text-xs text-gray-500">{s.label}</div>
+                    <div className="text-xs text-gray-400">{s.count} reviews</div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Reviews */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-            <h2 className="text-xl font-bold text-[#03243F] mb-4 font-[Playfair_Display,serif]">Recent Reviews</h2>
-            <div className="space-y-4">
-              {t.reviewList.map((r, i) => (
-                <div key={i} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-[#03243F] rounded-full flex items-center justify-center text-white text-xs font-bold">{r.author[0]}</div>
-                      <span className="font-medium text-gray-700">{r.author}</span>
-                      <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">{r.platform}</span>
+          {reviews && reviews.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <h2 className="text-xl font-bold text-[#03243F] mb-4" style={{fontFamily:'Playfair Display'}}>
+                Reviews ({score?.total_review_count || 0})
+              </h2>
+              <div className="space-y-4">
+                {reviews.map((review: any) => (
+                  <div key={review.id} className="border-b border-gray-100 pb-4 last:border-0">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="font-semibold text-[#03243F]">{review.reviewer_name || 'Anonymous'}</p>
+                        <div className="text-yellow-400 text-sm">{'★'.repeat(review.rating)}{'☆'.repeat(5-review.rating)}</div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full capitalize">{review.platform}</span>
+                        {review.review_date && (
+                          <p className="text-xs text-gray-400 mt-1">{new Date(review.review_date).toLocaleDateString()}</p>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-[#F4A636]">{'★'.repeat(r.rating)}</span>
-                      <span className="text-gray-400 text-xs">{r.date}</span>
+                    {review.body && <p className="text-gray-600 text-sm">{review.body}</p>}
+                    {review.trainer_response && (
+                      <div className="mt-2 pl-4 border-l-2 border-[#18A96B]">
+                        <p className="text-xs text-gray-500 mb-1">Trainer Response:</p>
+                        <p className="text-sm text-gray-600">{review.trainer_response}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Packages */}
+          {trainer.packages?.filter((p: any) => p.is_active).length > 0 && (
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <h2 className="text-xl font-bold text-[#03243F] mb-4" style={{fontFamily:'Playfair Display'}}>Training Packages</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {trainer.packages.filter((p: any) => p.is_active).map((pkg: any) => (
+                  <div key={pkg.id} className="border border-gray-200 rounded-xl p-4">
+                    <h3 className="font-semibold text-[#03243F] mb-1">{pkg.name}</h3>
+                    {pkg.description && <p className="text-sm text-gray-500 mb-2">{pkg.description}</p>}
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-[#18A96B]">
+                        ${(pkg.price_cents / 100).toFixed(0)}
+                      </span>
+                      {pkg.sessions && <span className="text-sm text-gray-500">{pkg.sessions} sessions</span>}
                     </div>
                   </div>
-                  <p className="text-gray-600 text-sm">{r.text}</p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-5">
-          {/* CTA */}
-          <div className="bg-[#03243F] rounded-2xl p-6 text-white text-center">
-            <h3 className="font-bold text-lg mb-2">Ready to Start?</h3>
-            <p className="text-gray-300 text-sm mb-4">Send {t.name.split(' ')[0]} a message. Free, no account required to inquire.</p>
-            <Link href="/signup" className="block w-full bg-[#18A96B] hover:bg-[#13875A] text-white font-bold py-3 rounded-xl transition-all mb-2">
-              Request a Session
-            </Link>
-            <button className="block w-full border border-white/30 hover:border-white text-white text-sm py-2.5 rounded-xl transition-all">
-              Save Trainer
-            </button>
-          </div>
+        <div className="space-y-6">
+          {/* Contact Form */}
+          <ContactForm trainerId={trainer.id} trainerName={trainer.full_name} />
 
-          {/* Packages */}
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-            <h3 className="font-bold text-[#03243F] mb-3">Packages</h3>
-            <div className="space-y-3">
-              {t.packages.map(p => (
-                <div key={p.name} className="p-3 bg-gray-50 rounded-xl">
-                  <div className="flex justify-between mb-0.5">
-                    <span className="font-medium text-sm text-[#03243F]">{p.name}</span>
-                    <span className="text-[#18A96B] font-bold text-sm">${p.price}</span>
-                  </div>
-                  <p className="text-gray-400 text-xs">{p.desc}</p>
-                </div>
-              ))}
+          {/* Certifications */}
+          {trainer.certifications?.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <h3 className="text-lg font-bold text-[#03243F] mb-3" style={{fontFamily:'Playfair Display'}}>Certifications</h3>
+              <ul className="space-y-2">
+                {trainer.certifications.map((cert: any) => (
+                  <li key={cert.id} className="flex items-start gap-2">
+                    <span className="text-[#18A96B] mt-0.5">✓</span>
+                    <div>
+                      <p className="text-sm font-medium text-[#03243F]">{cert.name}</p>
+                      {cert.issuing_org && <p className="text-xs text-gray-500">{cert.issuing_org}</p>}
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
+          )}
 
-          {/* Availability */}
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-            <h3 className="font-bold text-[#03243F] mb-3">Availability</h3>
-            <div className="flex gap-1.5 flex-wrap">
-              {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(day => (
-                <span key={day} className={`text-xs px-2.5 py-1 rounded-full font-medium ${t.availability.includes(day) ? 'bg-[#18A96B] text-white' : 'bg-gray-100 text-gray-400'}`}>{day}</span>
-              ))}
+          {/* Social Links */}
+          {(trainer.instagram || trainer.facebook || trainer.youtube || trainer.tiktok || trainer.website) && (
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <h3 className="text-lg font-bold text-[#03243F] mb-3" style={{fontFamily:'Playfair Display'}}>Connect</h3>
+              <div className="space-y-2">
+                {trainer.website && (
+                  <a href={trainer.website} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#18A96B]">
+                    🌐 Website
+                  </a>
+                )}
+                {trainer.instagram && (
+                  <a href={`https://instagram.com/${trainer.instagram.replace('@','')}`} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#18A96B]">
+                    📸 Instagram
+                  </a>
+                )}
+                {trainer.facebook && (
+                  <a href={trainer.facebook} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#18A96B]">
+                    👤 Facebook
+                  </a>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
-    </main>
+    </div>
   )
 }
