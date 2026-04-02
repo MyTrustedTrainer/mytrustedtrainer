@@ -25,14 +25,14 @@ export default function LoginPage() {
   async function handleMagicLink() {
     if (!email) { setError('Enter your email first'); return }
     setLoading(true)
-    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${location.origin}/auth/callback` } })
+    const redirectTo = window.location.origin + '/auth/callback'
+    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo } })
     if (error) { setError(error.message) } else { setMagicSent(true) }
     setLoading(false)
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#03243F] to-[#04305a] flex flex-col">
-      {/* Nav */}
       <nav className="px-6 py-5">
         <Link href="/" className="text-2xl font-bold text-white" style={{fontFamily:'Playfair Display'}}>
           <span className="text-[#18A96B]">My</span>TrustedTrainer
@@ -68,7 +68,7 @@ export default function LoginPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
                   <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-                    placeholder="••••••••" required
+                    placeholder="Password" required
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#18A96B]" />
                 </div>
 
@@ -93,7 +93,7 @@ export default function LoginPage() {
             )}
 
             <p className="text-center text-gray-500 text-sm mt-6">
-              Don't have an account?{' '}
+              Do not have an account yet?{' '}
               <Link href="/signup" className="text-[#18A96B] font-semibold hover:underline">Sign up free</Link>
             </p>
           </div>
