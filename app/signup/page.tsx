@@ -1,39 +1,125 @@
 'use client'
 import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 export default function SignupPage() {
-  const [type, setType] = useState<'client'|'trainer'>('client')
-  const [step, setStep] = useState(1)
+  const supabase = createClient()
+  const router = useRouter()
+  const [role, setRole] = useState<'trainer'|'client'>('trainer')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
 
-  return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
-      <nav className="bg-[#03243F] text-white px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="text-[#18A96B] text-xl font-bold font-[Playfair_Display,serif]">MyTrustedTrainer</Link>
-        <Link href="/login" className="text-gray-300 hover:text-white text-sm">Already have an account? Log in</Link>
+  async function handleSignup(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    const { data, error } = await supabase.auth.signUp({
+      email, password,
+      options: {
+        data: { full_name: name, role },
+        emailRedirectTo: `${location.origin}/auth/callback`
+      }
+    })
+    if (error) { setError(error.message); setLoading(false); return }
+    setSuccess(true)
+    setLoading(false)
+  }
+
+  if (success) return (
+    <div className="min-h-screen bg-gradient-to-br from-[#03243F] to-[#04305a] flex flex-col">
+      <nav className="px-6 py-5">
+        <Link href="/" className="text-2xl font-bold text-white" style={{fontFamily:'Playfair Display'}}>
+          <span className="text-[#18A96B]">My</span>TrustedTrainer
+        </Link>
       </nav>
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 w-full max-w-md">
-          <h1 className="text-2xl font-bold text-[#03243F] font-[Playfair_Display,serif] mb-2 text-center">Create Your Account</h1>
-          <p className="text-gray-500 text-sm text-center mb-6">Join thousands in College Station</p>
-
-          <div className="flex rounded-xl overflow-hidden border border-gray-200 mb-6">
-            <button onClick={() => setType('client')} className={`flex-1 py-2.5 text-sm font-semibold transition-all ${type === 'client' ? 'bg-[#03243F] text-white' : 'text-gray-500 hover:bg-gray-50'}`}>I am a Client</button>
-            <button onClick={() => setType('trainer')} className={`flex-1 py-2.5 text-sm font-semibold transition-all ${type === 'trainer' ? 'bg-[#03243F] text-white' : 'text-gray-500 hover:bg-gray-50'}`}>I am a Trainer</button>
+      <div className="flex-1 flex items-center justify-center px-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
           </div>
-
-          <div className="space-y-4">
-            <input type="text" placeholder="Full Name" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#18A96B]" />
-            <input type="email" placeholder="Email Address" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#18A96B]" />
-            <input type="password" placeholder="Password" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#18A96B]" />
-            {type === 'trainer' && <input type="text" placeholder="Your Specialty (e.g. Strength & Conditioning)" className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#18A96B]" />}
-            <button className="w-full bg-[#18A96B] hover:bg-[#13875A] text-white font-bold py-3 rounded-xl transition-all">
-              Create Account Free
-            </button>
-          </div>
-          <p className="text-center text-gray-400 text-xs mt-4">By signing up you agree to our <Link href="/terms" className="text-[#18A96B]">Terms</Link> and <Link href="/privacy" className="text-[#18A96B]">Privacy Policy</Link>.</p>
+          <h2 className="text-2xl font-bold text-[#03243F] mb-2" style={{fontFamily:'Playfair Display'}}>Check your email!</h2>
+          <p className="text-gray-600">We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.</p>
         </div>
       </div>
-    </main>
+    </div>
+  )
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#03243F] to-[#04305a] flex flex-col">
+      <nav className="px-6 py-5">
+        <Link href="/" className="text-2xl font-bold text-white" style={{fontFamily:'Playfair Display'}}>
+          <span className="text-[#18A96B]">My</span>TrustedTrainer
+        </Link>
+      </nav>
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-3xl shadow-2xl p-8">
+            <h1 className="text-3xl font-bold text-[#03243F] mb-2" style={{fontFamily:'Playfair Display'}}>Create Account</h1>
+            <p className="text-gray-500 mb-6">Join MyTrustedTrainer today</p>
+
+            {/* Role Toggle */}
+            <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+              {(['trainer','client'] as const).map(r => (
+                <button key={r} type="button" onClick={() => setRole(r)}
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                    role === r ? 'bg-white shadow text-[#03243F]' : 'text-gray-500 hover:text-gray-700'
+                  }`}>
+                  {r === 'trainer' ? '🏋️ I'm a Trainer' : '🎯 I'm Looking for a Trainer'}
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={handleSignup} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input type="text" value={name} onChange={e => setName(e.target.value)} required
+                  placeholder="John Smith"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#18A96B]" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
+                  placeholder="you@example.com"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#18A96B]" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
+                  placeholder="Min 8 characters" minLength={8}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#18A96B]" />
+              </div>
+
+              {role === 'trainer' && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                  <p className="text-sm text-amber-800">
+                    <strong>🌟 Founding Trainer Offer:</strong> First 25 trainers get Pro locked at $29/mo for life!
+                  </p>
+                </div>
+              )}
+
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+
+              <button type="submit" disabled={loading}
+                className="w-full bg-[#18A96B] text-white py-3.5 rounded-xl font-semibold hover:bg-[#15906A] disabled:opacity-50 transition-colors">
+                {loading ? 'Creating Account...' : 'Create Free Account'}
+              </button>
+            </form>
+
+            <p className="text-center text-gray-500 text-sm mt-6">
+              Already have an account?{' '}
+              <Link href="/login" className="text-[#18A96B] font-semibold hover:underline">Sign in</Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
