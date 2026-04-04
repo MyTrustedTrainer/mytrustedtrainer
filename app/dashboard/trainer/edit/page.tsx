@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import AvatarUpload from '@/components/AvatarUpload'
+import SiteHeader from '@/components/SiteHeader'
+import Link from 'next/link'
 
 const SPECIALTIES = ['Weight Loss','Strength Training','HIIT','Yoga','Pilates','CrossFit','Sports Performance','Bodybuilding','Cardio','Flexibility','Senior Fitness','Youth Athletics','Prenatal Fitness','Rehabilitation','Nutrition Coaching']
 const AVAILABILITY_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
@@ -47,7 +49,8 @@ export default function TrainerEditProfile() {
           phone: p.phone || '', email: p.email || '', website: p.website || '',
           instagram: p.instagram || '', facebook: p.facebook || '', youtube: p.youtube || '', tiktok: p.tiktok || '',
           zip: p.zip || '', price_per_session: p.price_per_session ? String(p.price_per_session) : '',
-          training_format: p.training_format || 'both', availability_days: p.availability_days || [], availability_note: p.availability_note || '',
+          training_format: p.training_format || 'both',
+          availability_days: p.availability_days || [], availability_note: p.availability_note || '',
         })
         setSelectedSpecialties(p.trainer_specialties?.map((s: any) => s.specialty) || [])
       } else {
@@ -67,11 +70,12 @@ export default function TrainerEditProfile() {
       if (!user) return
       const pct = calcCompletion(form, selectedSpecialties, !!avatarUrl)
       const profileData = {
-        full_name: form.full_name, tagline: form.tagline, bio: form.bio, phone: form.phone, email: form.email,
-        website: form.website, instagram: form.instagram, facebook: form.facebook, youtube: form.youtube, tiktok: form.tiktok,
+        full_name: form.full_name, tagline: form.tagline, bio: form.bio,
+        phone: form.phone, email: form.email, website: form.website,
+        instagram: form.instagram, facebook: form.facebook, youtube: form.youtube, tiktok: form.tiktok,
         zip: form.zip, price_per_session: form.price_per_session ? parseFloat(form.price_per_session) : null,
-        training_format: form.training_format, availability_days: form.availability_days, availability_note: form.availability_note,
-        profile_complete_pct: pct,
+        training_format: form.training_format, availability_days: form.availability_days,
+        availability_note: form.availability_note, profile_complete_pct: pct,
       }
       let profileId = profile?.id
       if (profile) {
@@ -91,36 +95,59 @@ export default function TrainerEditProfile() {
       }
       setMessage('Profile saved successfully!')
       setTimeout(() => router.push('/dashboard/trainer'), 1500)
-    } catch (err: any) { setMessage('Error saving: ' + err.message) }
+    } catch (err: any) {
+      setMessage('Error saving: ' + err.message)
+    }
     setSaving(false)
   }
 
   const completionPct = calcCompletion(form, selectedSpecialties, !!avatarUrl)
-  const tabs = [{id:'basics',label:'Basics'},{id:'contact',label:'Contact & Social'},{id:'training',label:'Training & Pricing'},{id:'availability',label:'Availability'},{id:'specialties',label:'Specialties'}]
+  const tabs = [
+    {id:'basics',label:'Basics'},
+    {id:'contact',label:'Contact & Social'},
+    {id:'training',label:'Training & Pricing'},
+    {id:'availability',label:'Availability'},
+    {id:'specialties',label:'Specialties'}
+  ]
 
-  if (loading) return <div className="min-h-screen bg-[#03243F] flex items-center justify-center"><div className="text-white">Loading...</div></div>
+  if (loading) return (
+    <div className="min-h-screen bg-[#03243F] flex items-center justify-center">
+      <div className="text-white">Loading...</div>
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-[#03243F] text-white">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <span className="text-2xl font-bold" style={{fontFamily:'Playfair Display'}}><span className="text-[#18A96B]">My</span>TrustedTrainer</span>
-          <a href="/dashboard/trainer" className="text-gray-300 hover:text-white text-sm">Back to Dashboard</a>
+      <SiteHeader />
+
+      {/* Back link — below header, above content */}
+      <div className="bg-[#03243F]">
+        <div className="max-w-4xl mx-auto px-4 pb-3 pt-1">
+          <Link href="/dashboard/trainer" className="inline-flex items-center gap-1 text-gray-400 hover:text-white text-sm transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Dashboard
+          </Link>
         </div>
-      </header>
+      </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold text-[#03243F]" style={{fontFamily:'Playfair Display'}}>{profile ? 'Edit Your Profile' : 'Create Your Profile'}</h1>
+          <h1 className="text-3xl font-bold text-[#03243F]" style={{fontFamily:'Playfair Display'}}>
+            {profile ? 'Edit Your Profile' : 'Create Your Profile'}
+          </h1>
           <span className="text-sm text-gray-500">{completionPct}% complete</span>
         </div>
+
         <div className="w-full bg-gray-100 rounded-full h-2 mb-6">
           <div className="bg-[#18A96B] h-2 rounded-full transition-all" style={{width: completionPct + '%'}} />
         </div>
 
         <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 overflow-x-auto">
           {tabs.map(tab => (
-            <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={"flex-1 min-w-max py-2 px-3 rounded-lg text-sm font-medium " + (activeTab === tab.id ? 'bg-white shadow text-[#03243F]' : 'text-gray-500')}>
+            <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)}
+              className={"flex-1 min-w-max py-2 px-3 rounded-lg text-sm font-medium " + (activeTab === tab.id ? 'bg-white shadow text-[#03243F]' : 'text-gray-500')}>
               {tab.label}
             </button>
           ))}
@@ -130,8 +157,6 @@ export default function TrainerEditProfile() {
           {activeTab === 'basics' && (
             <div className="bg-white rounded-2xl shadow-sm p-6 space-y-6">
               <h2 className="text-xl font-semibold text-[#03243F]">Basic Information</h2>
-
-              {/* Avatar Upload */}
               <div className="flex items-center gap-6 pb-6 border-b border-gray-100">
                 {user && (
                   <AvatarUpload uid={user.id} url={avatarUrl} name={form.full_name || 'Trainer'} size={96} table="trainer_profiles" onUpload={(url) => setAvatarUrl(url)} />
@@ -142,7 +167,6 @@ export default function TrainerEditProfile() {
                   <p className="text-xs text-gray-400 mt-1">JPG, PNG, or WebP · Max 5MB</p>
                 </div>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                 <input type="text" value={form.full_name} onChange={e => setForm({...form, full_name: e.target.value})} required className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#18A96B]" />
@@ -207,7 +231,8 @@ export default function TrainerEditProfile() {
               <p className="text-sm text-gray-500">Select your generally available days:</p>
               <div className="flex flex-wrap gap-2">
                 {AVAILABILITY_DAYS.map(day => (
-                  <button type="button" key={day} onClick={() => setForm(f => ({...f, availability_days: f.availability_days.includes(day) ? f.availability_days.filter(d => d !== day) : [...f.availability_days, day]}))}
+                  <button type="button" key={day}
+                    onClick={() => setForm(f => ({...f, availability_days: f.availability_days.includes(day) ? f.availability_days.filter(d => d !== day) : [...f.availability_days, day]}))}
                     className={"px-4 py-2 rounded-full text-sm font-medium transition-colors " + (form.availability_days.includes(day) ? 'bg-[#18A96B] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200')}>
                     {day}
                   </button>
@@ -226,7 +251,8 @@ export default function TrainerEditProfile() {
               <p className="text-sm text-gray-500 mb-4">Select all that apply.</p>
               <div className="flex flex-wrap gap-2">
                 {SPECIALTIES.map(s => (
-                  <button type="button" key={s} onClick={() => setSelectedSpecialties(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])}
+                  <button type="button" key={s}
+                    onClick={() => setSelectedSpecialties(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])}
                     className={"px-4 py-2 rounded-full text-sm font-medium transition-colors " + (selectedSpecialties.includes(s) ? 'bg-[#18A96B] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200')}>
                     {s}
                   </button>
@@ -236,12 +262,19 @@ export default function TrainerEditProfile() {
             </div>
           )}
 
-          {message && <div className={"mt-4 p-4 rounded-xl " + (message.includes('Error') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700')}>{message}</div>}
+          {message && (
+            <div className={"mt-4 p-4 rounded-xl " + (message.includes('Error') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700')}>
+              {message}
+            </div>
+          )}
+
           <div className="mt-6 flex gap-3">
             <button type="submit" disabled={saving} className="flex-1 bg-[#18A96B] text-white py-4 rounded-xl font-semibold text-lg hover:bg-[#15906A] disabled:opacity-50 transition-colors">
               {saving ? 'Saving...' : 'Save Profile'}
             </button>
-            <a href="/dashboard/trainer" className="px-6 py-4 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 transition-colors">Cancel</a>
+            <Link href="/dashboard/trainer" className="px-6 py-4 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 transition-colors">
+              Cancel
+            </Link>
           </div>
         </form>
       </div>
