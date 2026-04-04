@@ -11,10 +11,11 @@ interface Message {
   is_read: boolean
 }
 
-export default function ContactForm({ trainerId, trainerName }: { trainerId: string, trainerName: string }) {
+export default function ContactForm({ trainerId, trainerName, trainerUserId }: { trainerId: string, trainerName: string, trainerUserId: string }) {
   const supabase = createClient()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [isOwnProfile, setIsOwnProfile] = useState(false)
   const [conversation, setConversation] = useState<any>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
@@ -30,8 +31,14 @@ export default function ContactForm({ trainerId, trainerName }: { trainerId: str
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user)
-      if (user) loadConversation(user.id)
-      else setLoading(false)
+      if (user) {
+        if (user.id === trainerUserId) {
+          setIsOwnProfile(true)
+          setLoading(false)
+        } else {
+          loadConversation(user.id)
+        }
+      } else setLoading(false)
     })
   }, [])
 
@@ -104,6 +111,9 @@ export default function ContactForm({ trainerId, trainerName }: { trainerId: str
     } catch { setError('Network error. Please try again.') }
     finally { setSending(false) }
   }
+
+  // Don't show chat widget when the logged-in trainer is viewing their own profile
+  if (isOwnProfile) return null
 
   if (loading) return (
     <div className="bg-white rounded-2xl shadow-sm p-6 text-center">
