@@ -1,22 +1,10 @@
 import Link from 'next/link'
+import SiteHeader from '@/components/SiteHeader'
 
 export default function ForTrainersPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Nav */}
-      <nav className="bg-[#03243F] text-white">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="bg-[#18A96B] text-white text-xs font-bold px-2 py-1 rounded">MTT</span>
-            <span className="text-xl font-bold" style={{fontFamily:'Playfair Display'}}>MyTrustedTrainer</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/search" className="text-gray-300 hover:text-white text-sm">Find Trainers</Link>
-            <Link href="/login" className="text-gray-300 hover:text-white text-sm">Log In</Link>
-            <Link href="/signup" className="bg-[#18A96B] text-white text-sm font-semibold px-4 py-1.5 rounded-lg hover:bg-[#15906A]">Sign Up Free</Link>
-          </div>
-        </div>
-      </nav>
+      <SiteHeader />
 
       {/* Hero */}
       <section className="bg-gradient-to-br from-[#03243F] to-[#04305a] text-white py-20 px-6">
@@ -66,7 +54,7 @@ export default function ForTrainersPage() {
         </div>
       </section>
 
-      {/* How it works for trainers */}
+      {/* How it works */}
       <section className="py-20 px-6 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
@@ -105,23 +93,10 @@ export default function ForTrainersPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
             {[
-              {
-                name:'Free', price:'$0', period:'forever',
-                features:['Basic public profile','1 review platform connected','Up to 3 leads/month','MTT review badge'],
-                cta:'Get Started Free', href:'/signup?role=trainer&plan=free', featured:false
-              },
-              {
-                name:'Pro', price:'$49', period:'/month',
-                founding: '$29/mo founding price',
-                features:['All review platforms connected','Unlimited leads','Featured placement in search','Respond to reviews','Analytics dashboard','Priority support'],
-                cta:'Start Pro Trial', href:'/signup?role=trainer&plan=pro', featured:true
-              },
-              {
-                name:'Elite', price:'$99', period:'/month',
-                features:['Everything in Pro','Video testimonials','Homepage featured slot','CRM integrations','Dedicated account manager'],
-                cta:'Go Elite', href:'/signup?role=trainer&plan=elite', featured:false
-              },
-            ].map(plan => (
+              { name:'Free', price:'$0', period:'forever', features:['Basic public profile','1 review platform connected','Up to 3 leads/month','MTT review badge'], cta:'Get Started Free', href:'/signup?role=trainer&plan=free', featured:false },
+              { name:'Pro', price:'$49', period:'/month', founding:'$29/mo founding price', features:['All review platforms connected','Unlimited leads','Featured placement in search','Respond to reviews','Analytics dashboard','Priority support'], cta:'Start Pro Trial', href:'/signup?role=trainer&plan=pro', featured:true },
+              { name:'Elite', price:'$99', period:'/month', features:['Everything in Pro','Video testimonials','Homepage featured slot','CRM integrations','Dedicated account manager'], cta:'Go Elite', href:'/signup?role=trainer&plan=elite', featured:false },
+            ].map((plan: any) => (
               <div key={plan.name} className={`rounded-2xl p-8 relative ${plan.featured ? 'bg-[#03243F] text-white ring-4 ring-[#18A96B]' : 'bg-gray-50'}`}>
                 {plan.featured && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#18A96B] text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">Most Popular</div>}
                 <h3 className={`text-xl font-bold mb-1 ${plan.featured ? 'text-white' : 'text-[#03243F]'}`}>{plan.name}</h3>
@@ -129,18 +104,15 @@ export default function ForTrainersPage() {
                   <span className={`text-4xl font-bold ${plan.featured ? 'text-white' : 'text-[#03243F]'}`}>{plan.price}</span>
                   <span className={`text-sm mb-1 ${plan.featured ? 'text-gray-300' : 'text-gray-400'}`}>{plan.period}</span>
                 </div>
-                {(plan as any).founding && (
-                  <p className="text-[#F4A636] text-sm font-semibold mb-4">{(plan as any).founding}</p>
-                )}
+                {plan.founding && <p className="text-[#F4A636] text-sm font-semibold mb-4">{plan.founding}</p>}
                 <ul className="space-y-2 mb-8 mt-4">
-                  {plan.features.map(f => (
+                  {plan.features.map((f: string) => (
                     <li key={f} className={`flex items-start gap-2 text-sm ${plan.featured ? 'text-gray-300' : 'text-gray-600'}`}>
-                      <span className="text-[#18A96B] mt-0.5 flex-shrink-0">✓</span> {f}
+                      <span className="text-[#18A96B] mt-0.5 flex-shrink-0">&#10003;</span> {f}
                     </li>
                   ))}
                 </ul>
-                <Link href={plan.href}
-                  className={`block text-center py-3 rounded-xl font-semibold transition-colors ${plan.featured ? 'bg-[#18A96B] text-white hover:bg-[#15906A]' : 'bg-[#03243F] text-white hover:bg-[#04305a]'}`}>
+                <Link href={plan.href} className={`block text-center py-3 rounded-xl font-semibold transition-colors ${plan.featured ? 'bg-[#18A96B] text-white hover:bg-[#15906A]' : 'bg-[#03243F] text-white hover:bg-[#04305a]'}`}>
                   {plan.cta}
                 </Link>
               </div>
