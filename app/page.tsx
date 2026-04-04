@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import SiteHeader from '@/components/SiteHeader'
 import { createClient } from '@/lib/supabase/server'
 
 export default async function HomePage() {
@@ -16,20 +17,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Nav */}
-      <nav className="bg-[#03243F] text-white">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="bg-[#18A96B] text-white text-xs font-bold px-2 py-1 rounded">MTT</span>
-            <span className="text-xl font-bold" style={{fontFamily:'Playfair Display'}}>MyTrustedTrainer</span>
-          </Link>
-          <div className="flex items-center gap-6">
-            <Link href="/search" className="text-gray-300 hover:text-white text-sm font-medium">Find Trainers</Link>
-            <Link href="/for-trainers" className="text-gray-300 hover:text-white text-sm font-medium">For Trainers</Link>
-            <Link href="/login" className="text-gray-300 hover:text-white text-sm font-medium border border-gray-500 px-4 py-1.5 rounded-lg hover:border-white">Log In</Link>
-            <Link href="/signup" className="bg-[#18A96B] text-white text-sm font-semibold px-4 py-1.5 rounded-lg hover:bg-[#15906A]">Sign Up Free</Link>
-          </div>
-        </div>
-      </nav>
+      <SiteHeader />
 
       {/* Hero */}
       <section className="bg-gradient-to-br from-[#03243F] to-[#04305a] text-white py-24 px-6">
