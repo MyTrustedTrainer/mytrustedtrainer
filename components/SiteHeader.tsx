@@ -5,56 +5,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 interface SiteHeaderProps {
-  backHref?: string
-  backLabel?: string
+  showBack?: boolean
 }
 
-// Map a pathname to a friendly page name
-function pathnameToLabel(pathname: string): string {
-  if (pathname === '/') return 'Home'
-  if (pathname === '/search') return 'Search'
-  if (pathname === '/for-trainers') return 'For Trainers'
-  if (pathname === '/about') return 'About'
-  if (pathname === '/contact') return 'Contact'
-  if (pathname === '/privacy') return 'Privacy Policy'
-  if (pathname === '/terms') return 'Terms'
-  if (pathname === '/login') return 'Log In'
-  if (pathname === '/signup') return 'Sign Up'
-  if (pathname === '/dashboard/trainer') return 'Dashboard'
-  if (pathname === '/dashboard/trainer/edit') return 'Edit Profile'
-  if (pathname.startsWith('/dashboard/trainer/messages')) return 'Messages'
-  if (pathname.startsWith('/trainers/')) return 'Profile'
-  return 'Back'
-}
-
-export default function SiteHeader({ backHref, backLabel }: SiteHeaderProps) {
+export default function SiteHeader({ showBack }: SiteHeaderProps) {
   const supabase = createClient()
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
-  const [prevLabel, setPrevLabel] = useState<string | null>(null)
-  const [hasPrevPage, setHasPrevPage] = useState(false)
-
-  useEffect(() => {
-    // Detect previous page from document.referrer (same-origin only)
-    try {
-      const ref = document.referrer
-      if (ref) {
-        const refUrl = new URL(ref)
-        if (refUrl.origin === window.location.origin) {
-          const label = pathnameToLabel(refUrl.pathname)
-          setPrevLabel(label)
-          setHasPrevPage(true)
-        }
-      }
-      // Also check if there's any history to go back to
-      if (window.history.length > 1) {
-        setHasPrevPage(true)
-      }
-    } catch (_) {}
-  }, [])
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -100,41 +60,28 @@ export default function SiteHeader({ backHref, backLabel }: SiteHeaderProps) {
 
   const profileHref = profile?.slug ? '/trainers/' + profile.slug : '/dashboard/trainer'
 
-  // Determine back label — prop override wins, then dynamic referrer, then fallback
-  const resolvedBackLabel = backLabel ?? (prevLabel ? `Back to ${prevLabel}` : 'Back')
-  // Determine back destination — prop override wins, then router.back()
-  const hasBack = backHref ? true : hasPrevPage
-
-  function handleBack(e: React.MouseEvent) {
-    if (!backHref) {
-      e.preventDefault()
-      router.back()
-    }
-  }
-
   return (
     <nav className="bg-[#03243F] text-white sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
 
-        {/* Left: logo */}
-        <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <span className="bg-[#18A96B] text-white text-xs font-bold px-2 py-1 rounded">MTT</span>
-          <span className="text-xl font-bold" style={{fontFamily:'Playfair Display'}}>MyTrustedTrainer</span>
-        </Link>
-
-        {/* Center: back link — shown when backHref prop is passed OR when there is referrer history */}
-        {(backHref || hasPrevPage) && (
-          <a
-            href={backHref ?? '#'}
-            onClick={handleBack}
-            className="flex items-center gap-1 text-gray-300 hover:text-white text-sm absolute left-1/2 -translate-x-1/2 cursor-pointer whitespace-nowrap"
-          >
-            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {resolvedBackLabel}
-          </a>
-        )}
+        {/* Left: logo + optional back link stacked */}
+        <div className="flex flex-col flex-shrink-0">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="bg-[#18A96B] text-white text-xs font-bold px-2 py-1 rounded">MTT</span>
+            <span className="text-xl font-bold" style={{fontFamily:'Playfair Display'}}>MyTrustedTrainer</span>
+          </Link>
+          {showBack && (
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-1 text-gray-400 hover:text-white text-xs mt-1 text-left transition-colors"
+            >
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back
+            </button>
+          )}
+        </div>
 
         {/* Right: auth section */}
         <div className="flex items-center gap-2 flex-shrink-0">
