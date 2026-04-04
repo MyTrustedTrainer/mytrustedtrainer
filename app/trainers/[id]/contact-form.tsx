@@ -92,7 +92,7 @@ export default function ContactForm({ trainerId, trainerName }: { trainerId: str
       const res = await fetch('/api/conversations/' + conversation.id + '/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body: newMessage.trim() })
+        body: JSON.stringify({ message: newMessage.trim() })
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error || 'Failed to send message.'); return }
