@@ -1,4 +1,5 @@
 'use client'
+import SiteHeader from '@/components/SiteHeader'
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useParams } from 'next/navigation'
@@ -74,20 +75,22 @@ export default function TrainerMessageThread() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <header className="bg-[#03243F] text-white sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/dashboard/trainer" className="text-gray-300 hover:text-white">
+      <SiteHeader />
+      {/* Thread context bar */}
+      <div className="bg-[#03243F] text-white border-t border-white/10">
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
+          <Link href="/dashboard/trainer" className="text-gray-400 hover:text-white">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           </Link>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#18A96B] to-[#03243F] flex items-center justify-center text-white font-bold">
+          <div className="w-8 h-8 rounded-lg bg-[#18A96B] flex items-center justify-center text-white font-bold text-sm">
             {conversation?.client_name?.charAt(0).toUpperCase()}
           </div>
           <div>
-            <p className="font-semibold">{conversation?.client_name}</p>
+            <p className="font-semibold text-sm">{conversation?.client_name}</p>
             <p className="text-xs text-gray-400">{conversation?.client_email}</p>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Messages */}
       <div className="flex-1 max-w-3xl w-full mx-auto px-4 py-6 space-y-4 overflow-y-auto">
