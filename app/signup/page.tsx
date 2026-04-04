@@ -19,6 +19,24 @@ export default function SignupPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
+
+    // Check if email already exists across any account type
+    try {
+      const checkRes = await fetch('/api/auth/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase() })
+      })
+      const checkData = await checkRes.json()
+      if (checkData.exists) {
+        setError('An account with this email already exists. Please sign in instead.')
+        setLoading(false)
+        return
+      }
+    } catch {
+      // If check fails, proceed with signup (Supabase will handle duplicates)
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email, password,
       options: {
@@ -96,6 +114,11 @@ export default function SignupPage() {
                   )}
 
                   {error && <p className="text-red-500 text-sm">{error}</p>}
+                  {error && error.includes('already exists') && (
+                    <p className="text-sm text-center">
+                      <Link href="/login" className="text-[#18A96B] font-semibold hover:underline">Sign in to your existing account</Link>
+                    </p>
+                  )}
 
                   <button type="submit" disabled={loading}
                     className="w-full bg-[#18A96B] text-white py-3.5 rounded-xl font-semibold hover:bg-[#15906A] disabled:opacity-50 transition-colors">
