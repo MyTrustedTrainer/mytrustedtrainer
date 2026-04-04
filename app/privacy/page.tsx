@@ -1,15 +1,10 @@
 import Link from 'next/link'
+import SiteHeader from '@/components/SiteHeader'
+
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-white">
-      <nav className="bg-[#03243F] text-white px-6 py-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold" style={{fontFamily:'Playfair Display'}}>
-            <span className="text-[#18A96B]">My</span>TrustedTrainer
-          </Link>
-          <Link href="/" className="text-gray-300 hover:text-white text-sm">Back to Home</Link>
-        </div>
-      </nav>
+      <SiteHeader />
       <div className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-4xl font-bold text-[#03243F] mb-2" style={{fontFamily:'Playfair Display'}}>Privacy Policy</h1>
         <p className="text-gray-400 text-sm mb-8">Last updated: April 1, 2026</p>
