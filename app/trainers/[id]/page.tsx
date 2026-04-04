@@ -40,7 +40,7 @@ export default async function TrainerProfilePage({ params }: { params: { id: str
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Nav */}
-      <SiteHeader />
+      <SiteHeader showBack />
 
       {/* Hero */}
       <div className="bg-[#03243F]">
