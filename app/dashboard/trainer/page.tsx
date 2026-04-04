@@ -1,4 +1,5 @@
 'use client'
+import SiteHeader from '@/components/SiteHeader'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -248,17 +249,7 @@ export default function TrainerDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-[#03243F] text-white">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <span className="text-2xl font-bold" style={{fontFamily:'Playfair Display'}}>
-            <span className="text-[#18A96B]">My</span>TrustedTrainer
-          </span>
-          <div className="flex items-center gap-4">
-            {profile && <a href={'/trainers/' + profile.slug} target="_blank" className="text-sm text-[#18A96B] hover:underline">View Profile</a>}
-            <button onClick={async () => { await supabase.auth.signOut(); router.push('/') }} className="text-sm text-gray-300 hover:text-white">Sign Out</button>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
       <div className="max-w-7xl mx-auto px-4 py-8">
         {!profile ? (
           <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
