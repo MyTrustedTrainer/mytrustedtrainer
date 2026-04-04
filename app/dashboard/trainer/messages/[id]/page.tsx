@@ -75,7 +75,7 @@ export default function TrainerMessageThread() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <SiteHeader />
+      <SiteHeader showBack />
       {/* Thread context bar */}
       <div className="bg-[#03243F] text-white border-t border-white/10">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
