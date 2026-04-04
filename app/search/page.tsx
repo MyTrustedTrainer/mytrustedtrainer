@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import SiteHeader from '@/components/SiteHeader'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
@@ -56,18 +57,7 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Nav */}
-      <nav className="bg-[#03243F] text-white sticky top-0 z-20">
-        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="bg-[#18A96B] text-white text-xs font-bold px-2 py-1 rounded">MTT</span>
-            <span className="text-lg font-bold" style={{fontFamily:'Playfair Display'}}>MyTrustedTrainer</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="text-gray-300 hover:text-white text-sm">Log In</Link>
-            <Link href="/signup" className="bg-[#18A96B] text-white text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-[#15906A]">Sign Up</Link>
-          </div>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <div className="max-w-6xl mx-auto px-6 py-6">
         {/* Search bar */}
