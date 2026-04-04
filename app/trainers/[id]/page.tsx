@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import ContactForm from './contact-form'
+import SiteHeader from '@/components/SiteHeader'
 import Link from 'next/link'
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
@@ -39,17 +40,16 @@ export default async function TrainerProfilePage({ params }: { params: { id: str
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Nav */}
-      <nav className="bg-[#03243F] text-white px-6 py-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold" style={{fontFamily:'Playfair Display'}}>
-            <span className="text-[#18A96B]">My</span>TrustedTrainer
-          </Link>
-          <Link href="/search" className="text-gray-300 hover:text-white text-sm">← Back to Search</Link>
-        </div>
-      </nav>
+      <SiteHeader />
 
       {/* Hero */}
       <div className="bg-[#03243F]">
+        <div className="max-w-5xl mx-auto px-6 pt-4">
+          <Link href="/search" className="inline-flex items-center gap-1 text-gray-400 hover:text-white text-sm transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            Back
+          </Link>
+        </div>
         <div className="max-w-5xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row items-start gap-6">
             <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-[#18A96B] flex items-center justify-center text-white text-4xl font-bold flex-shrink-0">
