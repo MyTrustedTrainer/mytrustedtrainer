@@ -120,17 +120,6 @@ export default function TrainerEditProfile() {
     <div className="min-h-screen bg-gray-50">
       <SiteHeader />
 
-      {/* Back link — below header, above content */}
-      <div className="bg-[#03243F]">
-        <div className="max-w-4xl mx-auto px-4 pb-3 pt-1">
-          <Link href="/dashboard/trainer" className="inline-flex items-center gap-1 text-gray-400 hover:text-white text-sm transition-colors">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Dashboard
-          </Link>
-        </div>
-      </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-4">
