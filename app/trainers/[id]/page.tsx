@@ -186,7 +186,7 @@ export default async function TrainerProfilePage({ params }: { params: { id: str
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Contact Form */}
-          <ContactForm trainerId={trainer.id} trainerName={trainer.full_name} />
+          <ContactForm trainerId={trainer.id} trainerName={trainer.full_name} trainerUserId={trainer.user_id} />
 
           {/* Certifications */}
           {trainer.certifications?.length > 0 && (
