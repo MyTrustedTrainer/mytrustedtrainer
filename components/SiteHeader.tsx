@@ -59,9 +59,12 @@ export default function SiteHeader({ backHref, backLabel }: SiteHeaderProps) {
     ? profile.full_name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()
     : user?.email?.[0]?.toUpperCase() ?? '?'
 
+  const profileHref = profile?.slug ? '/trainers/' + profile.slug : '/dashboard/trainer'
+
   return (
     <nav className="bg-[#03243F] text-white sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+
         {/* Left: logo */}
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
           <span className="bg-[#18A96B] text-white text-xs font-bold px-2 py-1 rounded">MTT</span>
@@ -79,30 +82,36 @@ export default function SiteHeader({ backHref, backLabel }: SiteHeaderProps) {
         )}
 
         {/* Right: auth section */}
-        <div className="flex items-center gap-4 flex-shrink-0">
+        <div className="flex items-center gap-2 flex-shrink-0">
           {user ? (
-            <div className="relative" ref={menuRef}>
+            <div className="relative flex items-center gap-2" ref={menuRef}>
+
+              {/* Avatar — clicking goes directly to profile page */}
+              <Link
+                href={profileHref}
+                className="w-9 h-9 rounded-full bg-[#18A96B] flex items-center justify-center overflow-hidden flex-shrink-0 border-2 border-white/20 hover:border-white/60 transition-colors"
+                aria-label="View my profile"
+              >
+                {profile?.avatar_url
+                  ? <img src={profile.avatar_url} alt="avatar" className="w-full h-full object-cover" />
+                  : <span className="text-white text-sm font-bold">{initials}</span>
+                }
+              </Link>
+
+              {/* Hamburger — clicking opens the dropdown menu */}
               <button
                 onClick={() => setMenuOpen(v => !v)}
-                className="flex items-center gap-2 focus:outline-none"
+                className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 transition-colors focus:outline-none"
                 aria-label="Open menu"
               >
-                {/* Avatar circle */}
-                <div className="w-9 h-9 rounded-full bg-[#18A96B] flex items-center justify-center overflow-hidden flex-shrink-0 border-2 border-white/20">
-                  {profile?.avatar_url
-                    ? <img src={profile.avatar_url} alt="avatar" className="w-full h-full object-cover" />
-                    : <span className="text-white text-sm font-bold">{initials}</span>
-                  }
-                </div>
-                {/* Hamburger icon */}
                 <svg className="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
 
-              {/* Dropdown */}
+              {/* Dropdown — only triggered by hamburger */}
               {menuOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
+                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
                   {/* User info */}
                   <div className="px-4 py-3 border-b border-gray-100">
                     <p className="text-sm font-semibold text-[#03243F] truncate">{profile?.full_name || user.email}</p>
@@ -113,7 +122,6 @@ export default function SiteHeader({ backHref, backLabel }: SiteHeaderProps) {
                       </span>
                     )}
                   </div>
-
                   {/* Menu items */}
                   <div className="py-1">
                     {profile?.slug && (
@@ -131,7 +139,6 @@ export default function SiteHeader({ backHref, backLabel }: SiteHeaderProps) {
                       <span>&#x2B06;&#xFE0F;</span> Upgrade Plan
                     </Link>
                   </div>
-
                   <div className="border-t border-gray-100 py-1">
                     <button onClick={handleSignOut} className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 w-full text-left">
                       <span>&#x1F6AA;</span> Sign Out
@@ -149,6 +156,7 @@ export default function SiteHeader({ backHref, backLabel }: SiteHeaderProps) {
             </div>
           )}
         </div>
+
       </div>
     </nav>
   )
