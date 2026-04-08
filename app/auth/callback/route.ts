@@ -22,7 +22,16 @@ export async function GET(request: NextRequest) {
         },
       }
     )
-    await supabase.auth.exchangeCodeForSession(code)
+
+    const { data: { user } } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (user) {
+      const role = user.user_metadata?.role
+      if (role === 'trainer') return NextResponse.redirect(origin + '/onboarding/trainer/1')
+      if (role === 'client') return NextResponse.redirect(origin + '/onboarding/client')
+      return NextResponse.redirect(origin + '/onboarding/role')
+    }
   }
-  return NextResponse.redirect(origin + '/dashboard')
+
+  return NextResponse.redirect(origin + '/login')
 }
