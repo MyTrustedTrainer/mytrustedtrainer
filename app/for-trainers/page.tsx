@@ -296,4 +296,4 @@ export default function ForTrainersPage() {
                 </footer>
           </div>
         )
-}</div>
+}
