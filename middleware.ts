@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
@@ -19,7 +20,25 @@ export async function middleware(request: NextRequest) {
       },
     }
   )
-  await supabase.auth.getUser()
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const path = request.nextUrl.pathname
+
+  const isTrainerRoute = path.startsWith('/dashboard/trainer')
+  const isClientRoute = path.startsWith('/dashboard/client')
+  const isProtectedRoute = isTrainerRoute || isClientRoute
+
+  if (isProtectedRoute && !user) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  if (user) {
+    const role = user.user_metadata?.role
+    if (isTrainerRoute && role !== 'trainer') return NextResponse.redirect(new URL('/login', request.url))
+    if (isClientRoute && role !== 'client') return NextResponse.redirect(new URL('/login', request.url))
+  }
+
   return supabaseResponse
 }
 
