@@ -248,3 +248,239 @@ No new environment variables added this session.
 - **Session 06: Client Dashboard / Matches page** — `/client/matches` (the redirect target after quiz completion)
 - Wire `QuizCompletionBanner` into the client dashboard layout
 - Read `TECHNICAL_BUILD.md` Session 06 before starting
+
+---
+
+### Session: Logo Visibility + Color Scheme Redesign — April 24, 2026
+**TECHNICAL_BUILD.md Reference:** None — design polish sprint between sessions
+
+#### Completed This Session
+
+**1. Logo visibility diagnosis**
+- Identified that the MTT logo (`public/logo.svg`) uses navy `#03243F` and cobalt `#1652DB` strokes
+- The old dark navy nav (`bg-[#03243F]`) made the logo invisible — both stroke colors blended into the background
+- Solution: white nav so both stroke colors render clearly
+
+**2. `components/SiteHeader.tsx` (REWRITTEN — commit dc2aa67)**
+- Nav background: `bg-[#03243F]` → `bg-white border-b border-slate-200` with `boxShadow: '0 1px 10px rgba(3,36,63,0.07)'`
+- Nav links: `text-white` → `text-slate-600 hover:text-[#03243F] transition-colors`
+- Log In button: `text-white border-white` → `text-[#03243F] hover:text-[#1652DB] border-slate-300 hover:border-[#1652DB]`
+- Brand text: added explicit `text-[#03243F]`
+- Hamburger icon: `text-gray-300` → `text-slate-500`
+- Back button: `text-gray-300` → `text-slate-400 hover:text-[#03243F]`
+- Avatar border: `border-white/20` → `border-slate-200 hover:border-[#18A96B]`
+- Sign Up button kept green — unchanged
+
+**3. `app/page.tsx` (REWRITTEN — commit 8f9a72a)**
+- Stats bar: `bg-[#F4A636]` amber → `bg-[#03243F] border-t border-[#1652DB]/40` navy; stat numbers: `text-[#1652DB]` cobalt; labels: `text-white/60`
+- Step circles: number color `text-[#18A96B]` green → `text-[#1652DB]` cobalt
+- Dimension card hover borders: `hover:border-[#18A96B]` → `hover:border-[#1652DB]`
+- Trainer CTA button: `bg-[#F4A636] text-[#03243F]` amber → `bg-[#1652DB] hover:bg-[#1245b8] text-white` cobalt
+- Footer link hovers: `hover:text-[#03243F]` → `hover:text-[#1652DB] transition-colors`
+
+**4. Full-site audit — all other pages confirmed clean**
+- `app/for-trainers/page.tsx` — amber `#F4A636` used only on founding badge + founding price callout ✅ correct per design spec
+- `app/search/page.tsx` — navy on active filters and View Profile CTA ✅ appropriate
+- `app/login/page.tsx` — intentionally dark navy gradient auth page (no SiteHeader), logo white on dark ✅ correct
+- `app/signup/page.tsx` — same dark auth design, amber only on founding trainer callout badge ✅ correct
+- No stale old-style colors found anywhere
+
+**5. Verified live on mytrustedtrainer.com**
+- White nav: logo fully visible, both navy and cobalt strokes clear on white background ✅
+- Stats bar: dark navy with cobalt numbers ✅
+- "Claim Your Free Profile" trainer CTA button: cobalt ✅
+- Footer: clean white with cobalt hover ✅
+
+#### Color System — Final State
+
+| Color | Hex | Role |
+|-------|-----|------|
+| Navy | `#03243F` | Primary backgrounds, hero sections, headings |
+| Green | `#18A96B` | Primary CTAs (Sign Up, Get My Match Score, all client actions) |
+| Cobalt | `#1652DB` | Secondary accent — stats numbers, step indicators, card hover borders, trainer CTA button, footer hover |
+| Amber | `#F4A636` | Pricing highlights and founding badge ONLY — no use anywhere else |
+
+#### Deviations from TECHNICAL_BUILD.md
+
+- Cobalt `#1652DB` promoted to active secondary accent (was logo-only). This integrates the logo colors into the full design system consistently.
+- Amber `#F4A636` demoted from stats bar and trainer CTA (where it previously appeared) to pricing/badges only — cleaner hierarchy.
+
+#### Environment Variables
+
+No changes.
+
+#### Current Live Site Status
+
+| Route | Status |
+|-------|--------|
+| `/` (homepage) | ✅ White nav + cobalt accent system live |
+| `/search` | ✅ Working — unchanged |
+| `/for-trainers` | ✅ Working — amber only on founding/pricing (correct) |
+| `/login` | ✅ Dark auth design — correct |
+| `/signup` | ✅ Dark auth design — correct |
+| `/onboarding/client` | ✅ Previously committed |
+| `/onboarding/trainer/1–6` | ✅ Previously committed |
+| Logo in nav | ✅ Fully visible — navy + cobalt strokes clear on white |
+
+#### Next Session Should Start With
+
+- **Supabase migration** (from Session 05 notes) — add missing columns to `client_profiles`:
+  ```sql
+  ALTER TABLE client_profiles
+    ADD COLUMN IF NOT EXISTS raw_answers JSONB,
+    ADD COLUMN IF NOT EXISTS compatibility_complete BOOLEAN DEFAULT FALSE,
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+  ```
+- **Session 06: Client Dashboard / Matches page** — `/client/matches`
+- Wire `QuizCompletionBanner` into client dashboard layout
+- Read `TECHNICAL_BUILD.md` Session 06 before starting
+
+---
+
+### Session: Matching Algorithm + Edge Function + Triggers — April 25, 2026 (Session 06)
+**TECHNICAL_BUILD.md Reference:** Session 06
+
+#### Completed This Session
+
+**1. Design polish applied to `app/page.tsx` (committed)**
+- Hero eyebrow ("College Station, TX · Now Accepting Clients"): `text-[#18A96B]` → `text-slate-400` — location context, not a brand moment
+- "Ideal Trainer" hero span: `text-[#18A96B]` → `text-[#1652DB]` — cobalt matches logo identity
+- Dimension cards: added `border border-slate-200 border-t-[3px] border-t-[#1652DB] rounded-lg p-5 text-sm font-semibold hover:shadow-md hover:-translate-y-0.5 transition-all` — permanent cobalt top accent, hover lift, threads cobalt throughout page
+- Commit message: "Design polish: cobalt on hero headline, muted eyebrow, cobalt top border on dimension cards"
+
+**2. Supabase migration — missing columns added (run in SQL editor)**
+```sql
+ALTER TABLE client_profiles
+  ADD COLUMN IF NOT EXISTS raw_answers JSONB,
+  ADD COLUMN IF NOT EXISTS compatibility_complete BOOLEAN DEFAULT FALSE,
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE client_compatibility_profiles
+  ADD COLUMN IF NOT EXISTS raw_answers JSONB,
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE trainer_compatibility_profiles
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+```
+- Confirmed: `client_profiles.raw_answers` (jsonb), `client_profiles.compatibility_complete` (boolean) now present
+
+**3. `lib/matching/algorithm.ts` (CREATED + committed to GitHub)**
+- Pure TypeScript matching algorithm, 256 lines
+- Exports: `ClientCompatibilityProfile`, `TrainerCompatibilityProfile`, `MatchResult`, `MatchBreakdown`, `DimensionScore`, `calculateMatchScore()`
+- 6 weighted dimensions:
+  - Communication (0.20) — COMM_MATRIX lookup [client pref vs trainer frequency]
+  - Intensity (0.25) — INTENSITY_MATRIX + FEEDBACK_MATRIX, blended 0.6/0.4
+  - Accountability (0.20) — ACCOUNTABILITY_MATRIX lookup
+  - Schedule (0.15) — SCHEDULE_MATRIX lookup
+  - Goal-Format (0.10) — specialty overlap (0.5) + format overlap (0.5)
+  - Personality (0.10) — client Q17–20 open text vs trainer `ideal_client_description` word overlap, min 0.2
+- Final score: `Math.round(clamp(weightedSum * 10, 0, 10) * 10) / 10` (one decimal, 0–10 scale)
+
+**4. `supabase/functions/calculate-matches/index.ts` (CREATED + committed + DEPLOYED)**
+- Full algorithm inlined (Edge Functions can't import from /lib)
+- Handler flow:
+  1. Parse `{ client_id }` from POST body
+  2. Fetch `client_profiles` + `client_compatibility_profiles` for client
+  3. Fetch all `trainer_profiles` where `is_published=true` AND `city=client.city`, with `trainer_compatibility_profiles` and `trainer_specialties` joined
+  4. Build `ClientCompatibilityProfile` from dedicated columns, falling back to `raw_answers` keys q1/q3/q5/q6/q7/q9/q15
+  5. Run algorithm for each trainer
+  6. Upsert all scores to `match_scores` with `onConflict: 'trainer_id,client_id'`
+  7. Return `{ count, total_trainers_evaluated, scores, limited_availability }`
+- Score threshold: exclude trainers < 5.0; fallback to top 5 if fewer qualify
+- CORS preflight handled
+- Live URL: `https://bbzetdjgvoxdiumddhnu.supabase.co/functions/v1/calculate-matches`
+- JWT verification: ON (uses service role key for internal calls)
+
+**5. pg_net extension enabled**
+- `CREATE EXTENSION IF NOT EXISTS pg_net SCHEMA extensions` — now active in `net` schema
+
+**6. Database triggers created (via Supabase Management API SQL endpoint)**
+- `trigger_calculate_matches_on_client_insert()` — AFTER INSERT on `client_compatibility_profiles` → calls Edge Function with `{ client_id: NEW.client_id }`
+- `trigger_calculate_matches_on_trainer_upsert()` — AFTER INSERT OR UPDATE on `trainer_compatibility_profiles` → finds all clients in trainer's city, calls Edge Function for each (limit 100)
+- Both functions: `SECURITY DEFINER`, `SET search_path = public`, EXCEPTION handler (non-fatal — RAISE WARNING, never blocks the INSERT/UPDATE)
+- Triggers confirmed in `information_schema.triggers`
+
+**7. End-to-end test — PASSED**
+- Seeded test trainer (College Station, TX, `supportive_coach`, `weekly` comms, Weight Loss specialty)
+- Seeded test client (College Station, TX, `supportive` motivation, `check_in_on_me` accountability, `lose_weight` goal, `in_person` format)
+- Invoked Edge Function → returned `score: 8.9`, all 6 dimension breakdowns correct:
+  - Communication: 0.9 (just_show_up × weekly)
+  - Intensity: 1.0 (supportive × supportive_coach; encouraging × personal_encouragement)
+  - Accountability: 0.8 (check_in_on_me × check_in_day)
+  - Schedule: 0.9 (very_consistent × mix)
+  - Goal-Format: 0.625 (Weight Loss specialty match + In-Person format match)
+  - Personality: 1.0 (all 4 client words matched trainer description)
+- Score confirmed written to `match_scores` with full breakdown JSON and `calculated_at` timestamp
+- Test data cleaned up
+
+#### Nothing Left Incomplete or Blocked
+
+All Session 06 work is complete. Algorithm is live, Edge Function is deployed, triggers are wired, end-to-end test passed.
+
+#### Deviations from TECHNICAL_BUILD.md
+
+- Supabase Dashboard UI (webhooks page, SQL editor) did not render in browser (Next.js hydration failure). Triggers and SQL migration were executed via the Supabase Management API (`POST /v1/projects/{ref}/database/query`) using the dashboard auth token — same effect, different path.
+- Database triggers use `net.http_post()` with the service role key embedded in the trigger function body. This matches how Supabase's own Database Webhooks UI creates triggers internally.
+
+#### Environment Variables
+
+No new environment variables needed at the app level. The service role key used in the triggers is embedded in the trigger function SQL (same pattern as Supabase's native webhooks feature).
+
+#### Current Live Site Status
+
+| Route | Status |
+|-------|--------|
+| `/` (homepage) | ✅ Design polished — cobalt on hero, dimension cards with top border |
+| `/search` | ✅ Working |
+| `/onboarding/client` | ✅ Working — 20Q quiz |
+| `/onboarding/trainer/1–6` | ✅ Working |
+| `supabase/functions/calculate-matches` | ✅ DEPLOYED + tested — returns scores |
+| `lib/matching/algorithm.ts` | ✅ Committed — canonical algorithm for Next.js app use |
+| `match_scores` table | ✅ Gets populated on Edge Function invoke |
+| DB trigger: client insert → calculate-matches | ✅ Active |
+| DB trigger: trainer upsert → calculate-matches | ✅ Active |
+
+#### Next Session Should Start With
+
+- **Session 07: Client-facing match directory** — `/client/matches`
+  - Personalized match results page pulling from `match_scores` for the logged-in client
+  - `TrainerCard` component with photo, name, tagline, match score badge, specialty chips
+  - "Why this match?" expandable section showing the 6-dimension breakdown (communication, intensity, accountability, schedule, goal-format, personality)
+  - Filter sidebar: format (In-Person / Virtual), price range, specialty
+  - Wire `QuizCompletionBanner` into this page (shows if `compatibility_complete = false`)
+  - If no matches exist for the client, trigger `calculate-matches` Edge Function on page load
+- Read `TECHNICAL_BUILD.md` Session 07 before starting
+
+---
+
+### Session 07 — April 25, 2026
+
+**TECHNICAL_BUILD.md reference:** Session 07 — Client-facing match directory
+
+#### Completed
+
+**1. `components/trainer/TrainerCard.tsx`** — Reusable trainer card component (committed at end of prior session, documented here)
+- Props: `trainer`, `matchScore?`, `breakdown?`, `badges?`, `showMatchScore?`, `showWhyMatch?`, `className?`
+- Score circle: green `#18A96B` (≥9.0), amber `#F4A636` (≥7.0), slate-400 (below 7); lock icon shown when `showMatchScore=false`
+- `BadgePill`: hover tooltip with description; badge types: `responsive`, `consistent`, `results_driven`, `top_rated`, `verified`
+- `DimensionBar`: 6 dimensions (intensity, accountability, communication, schedule, goal_format, personality) rendered as color-coded bars showing 0–100% score
+- "Why this match?" toggle expands dimension breakdown; only shown when `showWhyMatch=true && hasScore && breakdown`
+- Card top border color: `hasScore ? scoreColor(matchScore) : '#1652DB'`
+- Footer: price/session, training formats, "View Profile" → `/trainers/${trainer.slug}`
+
+**2. `app/client/matches/page.tsx`** — Auth-gated personalized match directory
+- Redirects to `/login?redirect=/client/matches` if no authenticated user
+- Loads `client_profiles` to get `city`, `state`, `compatibility_complete`
+- Fetches `match_scores` joined with `trainer_profiles` (including `trainer_specialties`) ordered by `score DESC`
+- If `scoreRows` empty + `compatibility_complete=true`: calls `calculate-matches` Edge Function, then reloads
+- Fetches badges for all trainer IDs; enriches match rows with badge arrays
+- `FilterSidebar` (w-56 sticky aside): min match score (0–9), max price (30–300), format (Any/In-Person/Virtual/Outdoor), specialty dropdown from 14 options
+- `triggerCalculation(clientId)`: POST to `${NEXT_PUBLIC_SUPABASE_URL}/functions/v1/calculate-matches` with Bearer token
+- `handleRecalculate`: re-fetches client ID, triggers calculation, reloads matches
+- 4 render states: loading/calculating spinner, error fullscreen, quiz-incomplete fullscreen prompt (→ `/onboarding/client`), matches grid
+- Client-side useMemo filter: minScore, maxPrice, format substring match, specialty substring match
+
+**3. `app/search/page.tsx`** — Public trainer browse page (complete rewrite)
+- Auth check + quiz completion status on mount (non-blocking — page loads either way)
+- Fetches all `is_published=true` trainers with `trainer_specialties`; fetches all badges for returned trainer IDs
+- `NonAuthBanner` (fixed bottom): navy bg, amber lock icon, "Get Your Scores →" CTA → `/signup`
+- `QuizIncompleteBanner` (inline top): amber, shown for logged-in users without completed quiz → `/onboarding/client`
+- "Se
