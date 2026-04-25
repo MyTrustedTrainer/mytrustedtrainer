@@ -36,8 +36,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Stats bar */}
-        <section className="bg-[#F4A636] py-5 px-6">
+        {/* Stats bar — navy with cobalt numbers */}
+        <section className="bg-[#03243F] py-6 px-6 border-t border-[#1652DB]/40">
           <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
               { num: '35+', label: 'Vetted Local Trainers' },
@@ -46,8 +46,8 @@ export default function HomePage() {
               { num: 'Free', label: 'Always for Clients' },
             ].map(({ num, label }) => (
               <div key={label}>
-                <div className="text-[#03243F] font-bold text-2xl">{num}</div>
-                <div className="text-[#03243F]/80 text-sm font-medium">{label}</div>
+                <div className="text-[#1652DB] font-bold text-2xl">{num}</div>
+                <div className="text-white/60 text-sm font-medium">{label}</div>
               </div>
             ))}
           </div>
@@ -77,7 +77,7 @@ export default function HomePage() {
               },
             ].map(({ step, title, desc }) => (
               <div key={step} className="text-center">
-                <div className="w-16 h-16 rounded-full bg-[#03243F] text-[#18A96B] font-bold text-xl flex items-center justify-center mx-auto mb-5">
+                <div className="w-16 h-16 rounded-full bg-[#03243F] text-[#1652DB] font-bold text-xl flex items-center justify-center mx-auto mb-5">
                   {step}
                 </div>
                 <h3 className="font-[Playfair_Display] text-xl font-bold text-[#03243F] mb-3">{title}</h3>
@@ -111,7 +111,7 @@ export default function HomePage() {
               ].map((dim) => (
                 <div
                   key={dim}
-                  className="bg-white border border-slate-200 rounded-lg p-4 text-center text-sm font-medium text-[#03243F] hover:border-[#18A96B] hover:shadow-sm transition-all"
+                  className="bg-white border border-slate-200 rounded-lg p-4 text-center text-sm font-medium text-[#03243F] hover:border-[#1652DB] hover:shadow-sm transition-all"
                 >
                   {dim}
                 </div>
@@ -131,7 +131,7 @@ export default function HomePage() {
           </p>
           <Link
             href="/signup?role=trainer"
-            className="inline-block bg-[#F4A636] hover:bg-[#e09528] text-[#03243F] font-bold px-10 py-4 rounded-lg text-lg transition-colors"
+            className="inline-block bg-[#1652DB] hover:bg-[#1245b8] text-white font-bold px-10 py-4 rounded-lg text-lg transition-colors"
           >
             Claim Your Free Profile
           </Link>
@@ -140,9 +140,9 @@ export default function HomePage() {
         {/* Footer */}
         <footer className="py-10 px-6 text-center text-slate-500 text-sm bg-white border-t border-slate-100">
           <p className="mb-2">
-            <Link href="/search" className="hover:text-[#03243F] mr-4">Browse Trainers</Link>
-            <Link href="/onboarding/client" className="hover:text-[#03243F] mr-4">Get Matched</Link>
-            <Link href="/signup?role=trainer" className="hover:text-[#03243F]">Trainer Sign Up</Link>
+            <Link href="/search" className="hover:text-[#1652DB] mr-4 transition-colors">Browse Trainers</Link>
+            <Link href="/onboarding/client" className="hover:text-[#1652DB] mr-4 transition-colors">Get Matched</Link>
+            <Link href="/signup?role=trainer" className="hover:text-[#1652DB] transition-colors">Trainer Sign Up</Link>
           </p>
           <p>© {new Date().getFullYear()} MyTrustedTrainer · College Station, TX</p>
         </footer>
