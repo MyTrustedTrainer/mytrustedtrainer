@@ -7,12 +7,12 @@ import { createClient } from '@/lib/supabase/client'
 import TrainerCard from '@/components/trainer/TrainerCard'
 import { SlidersHorizontal, RefreshCw, ClipboardList, AlertCircle } from 'lucide-react'
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ââ Types âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 interface TrainerProfile {
   id: string
   full_name: string
-  slug: stringh
+  slug: string
   tagline?: string
   profile_photo_url?: string
   city?: string
@@ -40,7 +40,7 @@ interface Filters {
   maxPrice: number
 }
 
-// ── Filter sidebar ────────────────────────────────────────────────────────────
+// ââ Filter sidebar ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 const ALL_SPECIALTIES = [
   'Weight Loss', 'Muscle Building', 'HIIT', 'Strength', 'Powerlifting',
@@ -161,7 +161,7 @@ function FilterSidebar({
   )
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
+// ââ Main page âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 export default function ClientMatchesPage() {
   const router = useRouter()
@@ -182,7 +182,7 @@ export default function ClientMatchesPage() {
     maxPrice: 300,
   })
 
-  // ── Auth check ──────────────────────────────────────────────────────────────
+  // ââ Auth check ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
   useEffect(() => {
     const init = async () => {
@@ -197,7 +197,7 @@ export default function ClientMatchesPage() {
     init()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Load matches ────────────────────────────────────────────────────────────
+  // ââ Load matches ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
   const loadMatches = async (uid: string) => {
     setLoading(true)
@@ -241,7 +241,7 @@ export default function ClientMatchesPage() {
       if (scoreErr) throw scoreErr
 
       if (!scoreRows || scoreRows.length === 0) {
-        // No scores yet — trigger calculation if quiz is complete
+        // No scores yet â trigger calculation if quiz is complete
         if (cp.compatibility_complete) {
           await triggerCalculation(cp.id)
           // Reload after calculation
@@ -283,7 +283,7 @@ export default function ClientMatchesPage() {
     }
   }
 
-  // ── Trigger Edge Function ───────────────────────────────────────────────────
+  // ââ Trigger Edge Function âââââââââââââââââââââââââââââââââââââââââââââââââââ
 
   const triggerCalculation = async (clientId: string) => {
     setCalculating(true)
@@ -314,7 +314,7 @@ export default function ClientMatchesPage() {
     await loadMatches(userId)
   }
 
-  // ── Client-side filtering ───────────────────────────────────────────────────
+  // ââ Client-side filtering âââââââââââââââââââââââââââââââââââââââââââââââââââ
 
   const filtered = useMemo(() => {
     return matches.filter(m => {
@@ -339,14 +339,14 @@ export default function ClientMatchesPage() {
     })
   }, [matches, filters])
 
-  // ── Render states ───────────────────────────────────────────────────────────
+  // ââ Render states âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
   if (loading || calculating) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-4">
         <div className="w-10 h-10 rounded-full border-4 border-[#18A96B] border-t-transparent animate-spin" />
         <p className="text-slate-500 text-sm">
-          {calculating ? 'Calculating your personalized matches…' : 'Loading your matches…'}
+          {calculating ? 'Calculating your personalized matchesâ¦' : 'Loading your matchesâ¦'}
         </p>
       </div>
     )
@@ -381,7 +381,7 @@ export default function ClientMatchesPage() {
           href="/onboarding/client"
           className="px-6 py-3 bg-[#18A96B] hover:bg-[#159a5f] text-white font-semibold rounded-xl transition-colors"
         >
-          Start My Match Profile →
+          Start My Match Profile â
         </Link>
       </div>
     )
@@ -389,7 +389,7 @@ export default function ClientMatchesPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* ── Header ── */}
+      {/* ââ Header ââ */}
       <div className="bg-[#03243F] pt-10 pb-8 px-4">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
