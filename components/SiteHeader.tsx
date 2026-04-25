@@ -21,7 +21,7 @@ export default function SiteHeader({ showBack }: SiteHeaderProps) {
       setUser(user)
       if (user) {
         supabase.from('trainer_profiles')
-          .select('full_name, slug, avatar_url, plan')
+          .select('full_name, slug, profile_photo_url, plan_tier')
           .eq('user_id', user.id)
           .single()
           .then(({ data }) => setProfile(data))
@@ -60,11 +60,11 @@ export default function SiteHeader({ showBack }: SiteHeaderProps) {
 
   return (
     <nav className="bg-[#03243F] text-white sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
         <div className="flex flex-col flex-shrink-0">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="bg-[#18A96B] text-white text-xs font-bold px-2 py-1 rounded">MTT</span>
-            <span className="text-xl font-bold" style={{fontFamily:'Playfair Display'}}>MyTrustedTrainer</span>
+          <Link href="/" className="flex items-center gap-3">
+            <img src="/logo.svg" alt="MTT" className="h-10 w-auto" />
+            <span className="text-xl font-bold hidden sm:block" style={{fontFamily:'Playfair Display, serif'}}>MyTrustedTrainer</span>
           </Link>
           {showBack && (
             <button
@@ -86,8 +86,8 @@ export default function SiteHeader({ showBack }: SiteHeaderProps) {
                 className="w-9 h-9 rounded-full bg-[#18A96B] flex items-center justify-center overflow-hidden flex-shrink-0 border-2 border-white/20 hover:border-white/60 transition-colors"
                 aria-label="View my profile"
               >
-                {profile?.avatar_url
-                  ? <img src={profile.avatar_url} alt="avatar" className="w-full h-full object-cover" />
+                {profile?.profile_photo_url
+                  ? <img src={profile.profile_photo_url} alt="avatar" className="w-full h-full object-cover" />
                   : <span className="text-white text-sm font-bold">{initials}</span>
                 }
               </Link>
@@ -105,9 +105,9 @@ export default function SiteHeader({ showBack }: SiteHeaderProps) {
                   <div className="px-4 py-3 border-b border-gray-100">
                     <p className="text-sm font-semibold text-[#03243F] truncate">{profile?.full_name || user.email}</p>
                     <p className="text-xs text-gray-400 truncate">{user.email}</p>
-                    {profile?.plan && (
-                      <span className={"mt-1 inline-block text-xs px-2 py-0.5 rounded-full font-medium " + (profile.plan === 'elite' ? 'bg-purple-100 text-purple-700' : profile.plan === 'pro' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500')}>
-                        {profile.plan.toUpperCase()} PLAN
+                    {profile?.plan_tier && (
+                      <span className={`mt-1 inline-block text-xs px-2 py-0.5 rounded-full font-medium ${profile.plan_tier === 'pro' ? 'bg-purple-100 text-purple-700' : profile.plan_tier === 'growth' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
+                        {profile.plan_tier.toUpperCase()} PLAN
                       </span>
                     )}
                   </div>
