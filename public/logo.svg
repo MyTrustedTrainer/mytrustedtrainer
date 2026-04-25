@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 440">
+  <!-- MTT Geometric Logo - MyTrustedTrainer -->
+  <!-- Colors: Navy #03243F, Cobalt Blue #1652DB -->
+
+  <!-- Top crossbar spanning all three letters -->
+  <rect x="60" y="45" width="460" height="55" fill="#1652DB"/>
+  <!-- Left angled cut on crossbar -->
+  <polygon points="60,45 112,45 60,100" fill="#03243F"/>
+  <!-- Right angled cut on crossbar -->
+  <polygon points="468,45 520,45 520,100" fill="#03243F"/>
+
+  <!-- M: Left vertical leg (navy) -->
+  <rect x="60" y="100" width="52" height="295" fill="#03243F"/>
+
+  <!-- M: Left diagonal going to V-bottom (navy) -->
+  <polygon points="112,100 158,100 205,218 158,218" fill="#03243F"/>
+
+  <!-- M: Right diagonal going up from V-bottom (cobalt) -->
+  <polygon points="158,218 205,218 250,100 204,100" fill="#1652DB"/>
+
+  <!-- M: Right leg / T1 stem (cobalt) -->
+  <rect x="250" y="100" width="52" height="295" fill="#1652DB"/>
+
+  <!-- T2: Vertical stem (navy) -->
+  <rect x="416" y="100" width="52" height="295" fill="#03243F"/>
+
+  <!-- T2: Right angled top cut (navy) -->
+  <polygon points="468,100 520,100 520,152" fill="#03243F"/>
+</svg>
