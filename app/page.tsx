@@ -10,7 +10,7 @@ export default function HomePage() {
         {/* Hero */}
         <section className="bg-[#03243F] text-white py-24 px-6 text-center">
           <p className="text-[#18A96B] uppercase tracking-widest text-sm font-semibold mb-4">
-            College Station · Texas A&amp;M
+            College Station · Texas A&M
           </p>
           <h1 className="font-[Playfair_Display] text-5xl md:text-6xl font-bold leading-tight max-w-3xl mx-auto mb-6">
             Find Your <span className="text-[#18A96B]">Ideal Trainer</span>
@@ -28,7 +28,7 @@ export default function HomePage() {
               Get My Match Score →
             </Link>
             <Link
-              href="/trainers"
+              href="/search"
               className="border border-white/30 hover:border-white text-white font-semibold px-8 py-4 rounded-lg text-lg transition-colors"
             >
               Browse Trainers
@@ -140,7 +140,7 @@ export default function HomePage() {
         {/* Footer */}
         <footer className="py-10 px-6 text-center text-slate-500 text-sm bg-white border-t border-slate-100">
           <p className="mb-2">
-            <Link href="/trainers" className="hover:text-[#03243F] mr-4">Browse Trainers</Link>
+            <Link href="/search" className="hover:text-[#03243F] mr-4">Browse Trainers</Link>
             <Link href="/onboarding/client" className="hover:text-[#03243F] mr-4">Get Matched</Link>
             <Link href="/signup?role=trainer" className="hover:text-[#03243F]">Trainer Sign Up</Link>
           </p>
