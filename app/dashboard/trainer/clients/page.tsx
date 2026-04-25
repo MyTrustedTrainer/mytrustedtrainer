@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Crown } from 'lucide-react'
+import AddExistingClientModal from '@/components/AddExistingClientModal'
 
 export default async function ActiveClientsPage() {
   const supabase = createClient()
@@ -69,11 +70,7 @@ export default async function ActiveClientsPage() {
             {tier === 'growth' ? `${leads?.length || 0} / 5 clients` : `${leads?.length || 0} clients`}
           </p>
         </div>
-        {tier === 'pro' && (
-          <button className="px-4 py-2 bg-[#03243F] hover:bg-[#04304f] text-white rounded-xl text-sm font-semibold transition-colors">
-            + Add Existing Client
-          </button>
-        )}
+        {tier === 'pro' && <AddExistingClientModal />}
       </div>
 
       {!leads || leads.length === 0 ? (
