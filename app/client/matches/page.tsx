@@ -12,7 +12,7 @@ import { SlidersHorizontal, RefreshCw, ClipboardList, AlertCircle } from 'lucide
 interface TrainerProfile {
   id: string
   full_name: string
-  slug: string
+  slug: stringh
   tagline?: string
   profile_photo_url?: string
   city?: string
@@ -460,7 +460,7 @@ export default function ClientMatchesPage() {
                       key={m.trainer_id}
                       trainer={m.trainer_profiles}
                       matchScore={m.score}
-                      breakdown={m.breakdown as Parameters<typeof TrainerCard>[0]['breakdown']}
+                      breakdown={m.breakdown as unknown as Parameters<typeof TrainerCard>[0]['breakdown']}
                       badges={m.badges}
                       showMatchScore={true}
                       showWhyMatch={true}
