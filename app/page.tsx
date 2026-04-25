@@ -9,11 +9,11 @@ export default function HomePage() {
 
         {/* Hero */}
         <section className="bg-[#03243F] text-white py-24 px-6 text-center">
-          <p className="text-[#18A96B] uppercase tracking-widest text-sm font-semibold mb-4">
+          <p className="text-slate-400 uppercase tracking-widest text-sm font-semibold mb-4">
             College Station · Texas A&M
           </p>
           <h1 className="font-[Playfair_Display] text-5xl md:text-6xl font-bold leading-tight max-w-3xl mx-auto mb-6">
-            Find Your <span className="text-[#18A96B]">Ideal Trainer</span>
+            Find Your <span className="text-[#1652DB]">Ideal Trainer</span>
             <br />By Compatibility, Not Reviews
           </h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-10">
@@ -111,7 +111,7 @@ export default function HomePage() {
               ].map((dim) => (
                 <div
                   key={dim}
-                  className="bg-white border border-slate-200 rounded-lg p-4 text-center text-sm font-medium text-[#03243F] hover:border-[#1652DB] hover:shadow-sm transition-all"
+                  className="bg-white border border-slate-200 border-t-[3px] border-t-[#1652DB] rounded-lg p-5 text-center text-sm font-semibold text-[#03243F] hover:shadow-md hover:-translate-y-0.5 transition-all"
                 >
                   {dim}
                 </div>
