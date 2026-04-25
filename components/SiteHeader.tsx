@@ -63,7 +63,7 @@ export default function SiteHeader({ showBack }: SiteHeaderProps) {
       <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
         <div className="flex flex-col flex-shrink-0">
           <Link href="/" className="flex items-center gap-3">
-            <img src="/logo.svg" alt="MTT" className="h-10 w-auto" />
+            <img src="/logo.png" alt="MTT" className="h-10 w-auto" />
             <span className="text-xl font-bold hidden sm:block text-[#03243F]" style={{fontFamily:'Playfair Display, serif'}}>MyTrustedTrainer</span>
           </Link>
           {showBack && (
