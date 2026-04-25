@@ -59,17 +59,17 @@ export default function SiteHeader({ showBack }: SiteHeaderProps) {
   const profileHref = profile?.slug ? '/trainers/' + profile.slug : '/dashboard/trainer'
 
   return (
-    <nav className="bg-[#03243F] text-white sticky top-0 z-50">
+    <nav className="bg-white border-b border-slate-200 sticky top-0 z-50" style={{boxShadow:'0 1px 10px rgba(3,36,63,0.07)'}}>
       <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
         <div className="flex flex-col flex-shrink-0">
           <Link href="/" className="flex items-center gap-3">
             <img src="/logo.svg" alt="MTT" className="h-10 w-auto" />
-            <span className="text-xl font-bold hidden sm:block" style={{fontFamily:'Playfair Display, serif'}}>MyTrustedTrainer</span>
+            <span className="text-xl font-bold hidden sm:block text-[#03243F]" style={{fontFamily:'Playfair Display, serif'}}>MyTrustedTrainer</span>
           </Link>
           {showBack && (
             <button
               onClick={() => router.back()}
-              className="flex items-center gap-1 text-gray-400 hover:text-white text-xs mt-1 text-left transition-colors"
+              className="flex items-center gap-1 text-slate-400 hover:text-[#03243F] text-xs mt-1 text-left transition-colors"
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -83,7 +83,7 @@ export default function SiteHeader({ showBack }: SiteHeaderProps) {
             <div className="relative flex items-center gap-2" ref={menuRef}>
               <Link
                 href={profileHref}
-                className="w-9 h-9 rounded-full bg-[#18A96B] flex items-center justify-center overflow-hidden flex-shrink-0 border-2 border-white/20 hover:border-white/60 transition-colors"
+                className="w-9 h-9 rounded-full bg-[#18A96B] flex items-center justify-center overflow-hidden flex-shrink-0 border-2 border-slate-200 hover:border-[#18A96B] transition-colors"
                 aria-label="View my profile"
               >
                 {profile?.profile_photo_url
@@ -93,10 +93,10 @@ export default function SiteHeader({ showBack }: SiteHeaderProps) {
               </Link>
               <button
                 onClick={() => setMenuOpen(v => !v)}
-                className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 transition-colors focus:outline-none"
+                className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none"
                 aria-label="Open menu"
               >
-                <svg className="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
@@ -140,10 +140,10 @@ export default function SiteHeader({ showBack }: SiteHeaderProps) {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <Link href="/search" className="text-gray-300 hover:text-white text-sm font-medium hidden sm:block">Find Trainers</Link>
-              <Link href="/for-trainers" className="text-gray-300 hover:text-white text-sm font-medium hidden sm:block">For Trainers</Link>
-              <Link href="/login" className="text-gray-300 hover:text-white text-sm font-medium border border-gray-500 px-4 py-1.5 rounded-lg hover:border-white">Log In</Link>
-              <Link href="/signup" className="bg-[#18A96B] text-white text-sm font-semibold px-4 py-1.5 rounded-lg hover:bg-[#15906A]">Sign Up</Link>
+              <Link href="/search" className="text-slate-600 hover:text-[#03243F] text-sm font-medium hidden sm:block transition-colors">Find Trainers</Link>
+              <Link href="/for-trainers" className="text-slate-600 hover:text-[#03243F] text-sm font-medium hidden sm:block transition-colors">For Trainers</Link>
+              <Link href="/login" className="text-[#03243F] hover:text-[#1652DB] text-sm font-medium border border-slate-300 px-4 py-1.5 rounded-lg hover:border-[#1652DB] transition-colors">Log In</Link>
+              <Link href="/signup" className="bg-[#18A96B] text-white text-sm font-semibold px-4 py-1.5 rounded-lg hover:bg-[#15906A] transition-colors">Sign Up</Link>
             </div>
           )}
         </div>
