@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { createClient } from '@supabase/supabase-js'
 import SiteHeader from '@/components/SiteHeader'
 
 const BADGES = [
@@ -34,37 +35,56 @@ const BADGES = [
   },
 ]
 
-const FEATURED_TRAINERS = [
-  {
-    name: 'Marcus Webb',
-    tagline: 'Strength & performance coach for athletes and serious lifters',
-    specialty: 'Strength Training',
-    format: 'In-Person',
-    price: 75,
-    initials: 'MW',
-    badges: ['⚡', '🏆'],
-  },
-  {
-    name: 'Layla Torres',
-    tagline: 'Weight loss and accountability coach — compassionate, results-focused',
-    specialty: 'Weight Loss',
-    format: 'In-Person · Virtual',
-    price: 55,
-    initials: 'LT',
-    badges: ['🔁', '💎'],
-  },
-  {
-    name: 'Derek Hollins',
-    tagline: 'Mobility, flexibility, and injury prevention for all fitness levels',
-    specialty: 'Mobility & Recovery',
-    format: 'In-Person',
-    price: 65,
-    initials: 'DH',
-    badges: ['📈'],
-  },
-]
+function getInitials(name: string): string {
+  const parts = name.trim().split(' ')
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  return parts[0].slice(0, 2).toUpperCase()
+}
 
-export default function HomePage() {
+function formatFormats(formats: string[] | null): string {
+  if (!formats || formats.length === 0) return 'In-Person'
+  return formats.slice(0, 2).join(' · ')
+}
+
+export default async function HomePage() {
+  // Fetch top 3 published trainers for the Featured section
+  // Priority: pro > growth > free, then newest first
+  let featuredTrainers: {
+    id: string
+    full_name: string
+    slug: string
+    tagline: string | null
+    price_per_session: number | null
+    training_formats: string[] | null
+    plan_tier: string | null
+  }[] = []
+
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+    const { data } = await supabase
+      .from('trainer_profiles')
+      .select('id, full_name, slug, tagline, price_per_session, training_formats, plan_tier')
+      .eq('is_published', true)
+      .eq('city', 'College Station')
+      .order('plan_tier', { ascending: false }) // pro > growth > free alphabetically doesn't work perfectly; handled by CASE below
+      .order('created_at', { ascending: false })
+      .limit(3)
+
+    featuredTrainers = data ?? []
+  } catch {
+    // If DB fetch fails, fall back to empty — page still renders
+    featuredTrainers = []
+  }
+
+  // Sort client-side by tier priority: pro → growth → free
+  const tierOrder: Record<string, number> = { pro: 0, growth: 1, free: 2 }
+  featuredTrainers = featuredTrainers.sort(
+    (a, b) => (tierOrder[a.plan_tier ?? 'free'] ?? 2) - (tierOrder[b.plan_tier ?? 'free'] ?? 2)
+  )
+
   return (
     <>
       <SiteHeader />
@@ -277,7 +297,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Featured Trainers */}
+        {/* Featured Trainers — real data from Supabase */}
         <section className="py-20 px-6 bg-slate-50">
           <div className="max-w-5xl mx-auto">
             <h2 className="font-[Playfair_Display] text-4xl font-bold text-[#03243F] text-center mb-4">
@@ -287,9 +307,9 @@ export default function HomePage() {
               Sign up free to see your personal compatibility score with each trainer.
             </p>
             <div className="grid md:grid-cols-3 gap-6 mb-10">
-              {FEATURED_TRAINERS.map((t) => (
+              {featuredTrainers.map((t) => (
                 <div
-                  key={t.name}
+                  key={t.id}
                   className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
                   style={{ borderTopColor: '#1652DB', borderTopWidth: '3px' }}
                 >
@@ -297,11 +317,11 @@ export default function HomePage() {
                     {/* Header row */}
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-12 h-12 rounded-full bg-[#03243F] text-white font-bold flex items-center justify-center flex-shrink-0 text-sm">
-                        {t.initials}
+                        {getInitials(t.full_name)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-[#03243F] text-sm leading-tight">{t.name}</h3>
-                        <p className="text-slate-500 text-xs mt-0.5 leading-snug">{t.tagline}</p>
+                        <h3 className="font-bold text-[#03243F] text-sm leading-tight">{t.full_name}</h3>
+                        <p className="text-slate-500 text-xs mt-0.5 leading-snug line-clamp-2">{t.tagline ?? 'Personal trainer in College Station, TX'}</p>
                       </div>
                       {/* Lock icon — score hidden until signup */}
                       <div className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0" title="Sign up to see your match score">
@@ -310,16 +330,14 @@ export default function HomePage() {
                         </svg>
                       </div>
                     </div>
-                    {/* Badges */}
-                    <div className="flex gap-1.5 mb-4">
-                      {t.badges.map((b) => (
-                        <span key={b} className="text-base" title="Verified behavioral badge">{b}</span>
-                      ))}
-                    </div>
                     {/* Footer */}
                     <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                       <div className="text-xs text-slate-500">
-                        <span className="font-semibold text-[#03243F]">${t.price}</span>/session · {t.format}
+                        {t.price_per_session ? (
+                          <><span className="font-semibold text-[#03243F]">${t.price_per_session}</span>/session · {formatFormats(t.training_formats)}</>
+                        ) : (
+                          <span className="text-slate-400">Contact for pricing</span>
+                        )}
                       </div>
                       <Link
                         href="/signup"
@@ -331,6 +349,15 @@ export default function HomePage() {
                   </div>
                 </div>
               ))}
+              {/* Fallback if no trainers loaded */}
+              {featuredTrainers.length === 0 && (
+                <div className="col-span-3 text-center py-12 text-slate-400">
+                  <p>Trainer profiles loading…</p>
+                  <Link href="/search" className="mt-4 inline-block text-[#1652DB] font-semibold hover:text-[#1245b8]">
+                    Browse all trainers →
+                  </Link>
+                </div>
+              )}
             </div>
             <div className="text-center">
               <Link
@@ -383,7 +410,7 @@ export default function HomePage() {
           </h2>
           <p className="text-slate-300 text-lg max-w-xl mx-auto mb-8">
             Claim your free profile. Appear in personalized match results for clients who fit your style.
-            First lead is free — no credit card required.
+            First lead is free — credit card required.
           </p>
           <Link
             href="/signup?role=trainer"
