@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { sendTrainerWelcome } from '@/lib/resend/emails'
 
 export async function POST(req: Request) {
   const supabase = await createClient()
@@ -13,13 +14,15 @@ export async function POST(req: Request) {
   // Get trainer profile id
   const { data: trainerProfile } = await supabase
     .from('trainer_profiles')
-    .select('id')
+    .select('id, full_name, onboarding_complete')
     .eq('user_id', user.id)
     .single()
 
   if (!trainerProfile) {
     return NextResponse.json({ error: 'Trainer profile not found' }, { status: 404 })
   }
+
+  const isFirstTime = !trainerProfile.onboarding_complete
 
   const { error } = await supabase
     .from('trainer_compatibility_profiles')
@@ -40,6 +43,20 @@ export async function POST(req: Request) {
   if (error) {
     console.error('Upsert trainer compatibility error:', error)
     return NextResponse.json({ error: 'Failed to save profile' }, { status: 500 })
+  }
+
+  // Mark onboarding complete
+  await supabase
+    .from('trainer_profiles')
+    .update({ onboarding_complete: true })
+    .eq('id', trainerProfile.id)
+
+  // Send welcome email on first completion (non-blocking)
+  if (isFirstTime && user.email) {
+    try {
+      const firstName = trainerProfile.full_name?.split(' ')[0] ?? 'there'
+      await sendTrainerWelcome(user.email, firstName)
+    } catch {}
   }
 
   return NextResponse.json({ success: true })
