@@ -1,8 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { Resend } from 'resend'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import { sendExistingClientInvite } from '@/lib/resend/emails'
 
 export async function POST(request: Request) {
   const supabase = createClient()
@@ -47,28 +45,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to create invite' }, { status: 500 })
   }
 
-  const inviteUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://mytrustedtrainer.com'}/accept-invite/${lead.id}`
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mytrustedtrainer.com'
+  const inviteUrl = `${siteUrl}/accept-invite/${lead.id}`
 
+  // Send invite email using typed template (non-blocking)
   try {
-    await resend.emails.send({
-      from: 'MyTrustedTrainer <hello@mytrustedtrainer.com>',
-      to: email,
-      subject: `${trainer.full_name} invited you to MyTrustedTrainer`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #03243F;">You've been invited!</h2>
-          <p>${trainer.full_name} has invited you to connect on MyTrustedTrainer — a platform that tracks your training progress and keeps everything in one place.</p>
-          <p>This invite expires in 7 days.</p>
-          <a href="${inviteUrl}" style="display:inline-block;background:#18A96B;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:bold;margin-top:16px;">
-            Accept Invite →
-          </a>
-          <p style="color:#888;font-size:12px;margin-top:24px;">If you didn't expect this, you can ignore this email.</p>
-        </div>
-      `,
-    })
-  } catch {
-    // Email failure is non-blocking per project rules
-  }
+    // Extract first name from email as best guess if no name provided
+    const clientFirstName = email.split('@')[0].split('.')[0]
+    await sendExistingClientInvite(email, clientFirstName, trainer.full_name, inviteUrl)
+  } catch {}
 
   return NextResponse.json({ success: true, invite_id: lead.id })
 }
