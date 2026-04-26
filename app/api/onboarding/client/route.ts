@@ -1,9 +1,9 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
+import { sendClientWelcome } from '@/lib/resend/emails'
 
-// âââ GET â load existing quiz progress âââââââââââââââââââââââââââââââââââââââ
+// ─── GET — load existing quiz progress ───────────────────────────────────────
 
 export async function GET() {
   const cookieStore = cookies()
@@ -30,7 +30,6 @@ export async function GET() {
     .single()
 
   if (error && error.code !== 'PGRST116') {
-    // PGRST116 = row not found â fine, just return empty
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
@@ -40,7 +39,7 @@ export async function GET() {
   })
 }
 
-// âââ POST â save incremental progress or mark complete ââââââââââââââââââââââââ
+// ─── POST — save incremental progress or mark complete ───────────────────────
 
 export async function POST(req: NextRequest) {
   const cookieStore = cookies()
@@ -81,7 +80,6 @@ export async function POST(req: NextRequest) {
     raw_answers:            answers,
     compatibility_complete: complete,
     updated_at:             new Date().toISOString(),
-    // Mapped columns (ignored if column doesn't exist yet â handled by try/catch)
     ...(goal       && { goals: goal }),
     ...(experience && { experience_level: experience }),
     ...(frequency  && { training_frequency: frequency }),
@@ -89,13 +87,23 @@ export async function POST(req: NextRequest) {
     ...(format     && { training_format: format }),
   }
 
-  // Try full upsert first; if unknown columns cause an error, fall back to minimal payload
+  // Check if this is first-time completion before upsert
+  let wasAlreadyComplete = false
+  if (complete) {
+    const { data: existing } = await supabase
+      .from('client_profiles')
+      .select('compatibility_complete, full_name')
+      .eq('user_id', user.id)
+      .maybeSingle()
+    wasAlreadyComplete = existing?.compatibility_complete ?? false
+  }
+
+  // Try full upsert first; fall back to minimal payload if unknown columns
   let { error } = await supabase
     .from('client_profiles')
     .upsert(payload, { onConflict: 'user_id' })
 
   if (error) {
-    // Fallback: only the columns we know always exist
     const fallback = await supabase
       .from('client_profiles')
       .upsert(
@@ -110,6 +118,19 @@ export async function POST(req: NextRequest) {
     if (fallback.error) {
       return NextResponse.json({ error: fallback.error.message }, { status: 500 })
     }
+  }
+
+  // Send welcome email on first quiz completion (non-blocking)
+  if (complete && !wasAlreadyComplete && user.email) {
+    try {
+      const { data: profile } = await supabase
+        .from('client_profiles')
+        .select('full_name')
+        .eq('user_id', user.id)
+        .maybeSingle()
+      const firstName = profile?.full_name?.split(' ')[0] ?? 'there'
+      await sendClientWelcome(user.email, firstName)
+    } catch {}
   }
 
   return NextResponse.json({ ok: true, complete })
