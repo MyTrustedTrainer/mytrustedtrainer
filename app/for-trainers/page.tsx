@@ -5,7 +5,7 @@ export default function ForTrainersPage() {
     return (
           <div className="min-h-screen bg-white">
                 <SiteHeader />
-          
+
             {/* Hero */}
                 <section className="bg-gradient-to-br from-[#03243F] to-[#04305a] text-white py-20 px-6">
                         <div className="max-w-4xl mx-auto text-center">
@@ -28,7 +28,7 @@ export default function ForTrainersPage() {
                                   </div>
                         </div>
                 </section>
-          
+
             {/* Why Compatibility Matching */}
                 <section className="py-20 px-6">
                         <div className="max-w-5xl mx-auto">
@@ -49,23 +49,23 @@ export default function ForTrainersPage() {
             },
             {
                               icon: '🏅',
-                              title: 'Earned Trust Badges',
+                              title: 'Verified Behavioral Badges',
                               desc: 'Badges on your profile are earned exclusively from private behavioral data collected from your matched clients over time. They cannot be bought, requested, or faked.',
             },
             {
                               icon: '📈',
                               title: 'Built-In CRM',
-                              desc: 'Pro and Elite plans include a full client management system — routines, check-ins, calendar, and messaging — so your entire business runs on one platform.',
+                              desc: 'Growth and Pro plans include a full client management system — routines, check-ins, calendar, and messaging — so your entire business runs on one platform.',
             },
             {
                               icon: '🔒',
                               title: 'Priority Placement',
-                              desc: 'Elite trainers appear at the top of every matched client&apos;s personalized ranked directory. Not based on ad spend — based on fit score.',
+                              desc: 'Pro trainers appear at the top of every matched client&apos;s personalized ranked directory. Not based on ad spend — based on fit score.',
             },
             {
                               icon: '👥',
                               title: 'Bring Existing Clients',
-                              desc: 'Elite trainers can onboard their current clients directly into the platform, so behavioral data starts building your badge profile from day one.',
+                              desc: 'Pro trainers can onboard their current clients directly into the platform, so behavioral data starts building your badge profile from day one.',
             },
             {
                               icon: '📊',
@@ -82,7 +82,7 @@ export default function ForTrainersPage() {
                                   </div>
                         </div>
                 </section>
-          
+
             {/* How It Works */}
                 <section className="py-20 px-6 bg-gray-50">
                         <div className="max-w-4xl mx-auto">
@@ -106,7 +106,7 @@ export default function ForTrainersPage() {
             {
                               n: '3',
                               title: 'Receive Pre-Qualified Leads',
-                              desc: 'Clients who contact you already fit your profile. Free trainers get their first lead free, then $15/lead. Pro and Elite get unlimited leads.',
+                              desc: 'Clients who contact you already fit your profile. Free trainers get their first lead free, then $15/lead. Growth and Pro get unlimited leads.',
             },
                         ].map((step) => (
                                         <div key={step.n} className="text-center">
@@ -125,13 +125,13 @@ export default function ForTrainersPage() {
                                   </div>
                         </div>
                 </section>
-          
+
             {/* Pricing */}
                 <section id="pricing" className="py-20 px-6">
                         <div className="max-w-5xl mx-auto">
                                   <div className="text-center mb-10">
                                               <div className="inline-block bg-[#F4A636]/20 text-[#F4A636] font-bold px-4 py-1.5 rounded-full text-sm mb-4">
-                                                            Founding Member Offer: First 25 trainers get Pro locked at $29/mo for life
+                                                            Founding Member Offer: First 25 trainers get Growth locked at $29/mo for life
                                               </div>
                                               <h2 className="text-3xl font-bold text-[#03243F] mb-2" style={{ fontFamily: 'Playfair Display' }}>
                                                             Simple, Transparent Pricing
@@ -139,7 +139,7 @@ export default function ForTrainersPage() {
                                               <p className="text-gray-500">Clients are always free. Start free and upgrade when you&apos;re ready.</p>
                                   </div>
                                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
-                                  
+
                                     {/* Free */}
                                               <div className="rounded-2xl p-8 bg-gray-50">
                                                             <h3 className="text-xl font-bold mb-1 text-[#03243F]">Free</h3>
@@ -163,13 +163,13 @@ export default function ForTrainersPage() {
                                                                             Get Started Free
                                                             </Link>
                                               </div>
-                                  
-                                    {/* Pro */}
+
+                                    {/* Growth */}
                                               <div className="rounded-2xl p-8 bg-[#03243F] text-white ring-4 ring-[#18A96B] relative">
                                                             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#18A96B] text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">
                                                                             Most Popular
                                                             </div>
-                                                            <h3 className="text-xl font-bold mb-1 text-white">Pro</h3>
+                                                            <h3 className="text-xl font-bold mb-1 text-white">Growth</h3>
                                                             <div className="flex items-end gap-1 mb-1">
                                                                             <span className="text-4xl font-bold text-white">$49</span>
                                                                             <span className="text-sm mb-1 text-gray-300">/month</span>
@@ -189,21 +189,21 @@ export default function ForTrainersPage() {
                                                 </li>
                                               ))}
                                                             </ul>
-                                                            <Link href="/signup?role=trainer&plan=pro" className="block text-center py-3 rounded-xl font-semibold transition-colors bg-[#18A96B] text-white hover:bg-[#15906A]">
-                                                                            Start Pro Trial
+                                                            <Link href="/signup?role=trainer&plan=growth" className="block text-center py-3 rounded-xl font-semibold transition-colors bg-[#18A96B] text-white hover:bg-[#15906A]">
+                                                                            Claim Founding Rate
                                                             </Link>
                                               </div>
-                                  
-                                    {/* Elite */}
+
+                                    {/* Pro */}
                                               <div className="rounded-2xl p-8 bg-gray-50">
-                                                            <h3 className="text-xl font-bold mb-1 text-[#03243F]">Elite</h3>
+                                                            <h3 className="text-xl font-bold mb-1 text-[#03243F]">Pro</h3>
                                                             <div className="flex items-end gap-1 mb-4">
                                                                             <span className="text-4xl font-bold text-[#03243F]">$99</span>
                                                                             <span className="text-sm mb-1 text-gray-400">/month</span>
                                                             </div>
                                                             <ul className="space-y-2 mb-8">
                                                               {[
-                              'Everything in Pro',
+                              'Everything in Growth',
                               'Unlimited active clients',
                               'Onboard your existing clients',
                               'Priority placement in all matches',
@@ -215,15 +215,15 @@ export default function ForTrainersPage() {
                                                 </li>
                                               ))}
                                                             </ul>
-                                                            <Link href="/signup?role=trainer&plan=elite" className="block text-center py-3 rounded-xl font-semibold transition-colors bg-[#03243F] text-white hover:bg-[#04305a]">
-                                                                            Go Elite
+                                                            <Link href="/signup?role=trainer&plan=pro" className="block text-center py-3 rounded-xl font-semibold transition-colors bg-[#03243F] text-white hover:bg-[#04305a]">
+                                                                            Go Pro
                                                             </Link>
                                               </div>
-                                  
+
                                   </div>
                         </div>
                 </section>
-          
+
             {/* FAQ */}
                 <section className="py-20 px-6 bg-gray-50">
                         <div className="max-w-3xl mx-auto">
@@ -238,15 +238,15 @@ export default function ForTrainersPage() {
             },
             {
                               q: 'What are the badges and how do I earn them?',
-                              a: 'Badges are earned exclusively from private behavioral data collected from your matched clients over time — things like consistency, communication, and results. They cannot be purchased, requested, or self-reported. They are the platform\'s trust moat.',
+                              a: "Badges are earned exclusively from private behavioral data collected from your matched clients over time — things like consistency, communication, and results. They cannot be purchased, requested, or self-reported. They are the platform's trust moat.",
             },
             {
                               q: 'What is the Founding Trainer offer?',
-                              a: 'The first 25 trainers who subscribe to Pro get their rate locked at $29/month for life — even after we raise prices. Use code MTT-FOUNDING at checkout.',
+                              a: 'The first 25 trainers who subscribe to Growth get their rate locked at $29/month for life — even after we raise prices. Use code MTT-FOUNDING at checkout.',
             },
             {
-                              q: 'What\'s included in the CRM?',
-                              a: 'Pro trainers get a full CRM for up to 5 active clients: custom routines, session check-ins, calendar, and direct messaging. Elite removes the client cap and adds the ability to onboard trainers you already work with.',
+                              q: "What's included in the CRM?",
+                              a: 'Growth trainers get a full CRM for up to 5 active clients: custom routines, session check-ins, calendar, and direct messaging. Pro removes the client cap and adds the ability to onboard clients you already work with.',
             },
             {
                               q: 'Can I cancel anytime?',
@@ -261,7 +261,7 @@ export default function ForTrainersPage() {
                                   </div>
                         </div>
                 </section>
-          
+
             {/* CTA */}
                 <section className="py-20 px-6 bg-[#03243F] text-white">
                         <div className="max-w-3xl mx-auto text-center">
@@ -276,7 +276,7 @@ export default function ForTrainersPage() {
                                   </Link>
                         </div>
                 </section>
-          
+
             {/* Footer */}
                 <footer className="bg-[#02192d] text-gray-400 py-8 px-6">
                         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
